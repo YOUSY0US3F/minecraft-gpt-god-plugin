@@ -1,9 +1,9 @@
-name: example_plugin
+name: gptgodmc
 version: ${version}
-main: com.example.voicechatplugin.ExamplePlugin
+main: net.bigyous.gptgodmc.GPTGOD
 api-version: ${bukkit_api_version}
-prefix: example_plugin
-authors: [ "Example Author" ]
-description: A Simple Voice Chat API plugin example
-website: https://example.com
+prefix: gptgodmc
+authors: [ "YOUS", "Anders" ]
+description: Minecraft is not so godless anymore...
+website: https://bigyous.net
 depend: [ voicechat ]
