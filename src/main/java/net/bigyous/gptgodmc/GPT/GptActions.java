@@ -3,12 +3,8 @@ package net.bigyous.gptgodmc.GPT;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.json.Json;
-
-import java.util.HashMap;
-
-import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.ParseResults;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.Choice;
@@ -16,19 +12,12 @@ import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptResponse;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.Parameter;
-import net.bigyous.gptgodmc.GPT.Json.ResponseMessage;
 import net.bigyous.gptgodmc.GPT.Json.ToolCall;
 import net.bigyous.gptgodmc.interfaces.Function;
 
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.main.GameConfig.GameData;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -41,21 +30,16 @@ public class GptActions {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        ServerPlayer player = GPTGOD.SERVER.getPlayerList().getPlayerByName(argsMap.get("playerName"));
-        player.sendSystemMessage(
-                Component.literal("You hear something whisper to you...").withStyle(ChatFormatting.UNDERLINE));
-        player.sendSystemMessage(Component.literal(argsMap.get("message")).withStyle(ChatFormatting.ITALIC));
+        Player player = GPTGOD.SERVER.getPlayer(argsMap.get("playerName"));
+        player.sendRichMessage("<i>You hear something whisper to you...</i>");
+        player.sendMessage(argsMap.get("message"));
     };
     private static Function<String> announce = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        PlayerList players = GPTGOD.SERVER.getPlayerList();
-        players.broadcastSystemMessage(Component.literal("A Loud voice bellows from the heavens")
-                .withStyle(ChatFormatting.BOLD, ChatFormatting.YELLOW), false);
-        players.broadcastSystemMessage(
-                Component.literal(argsMap.get("message")).withStyle(ChatFormatting.BOLD, ChatFormatting.LIGHT_PURPLE),
-                false);
+        GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW).decoration(TextDecoration.BOLD, true));
+        GPTGOD.SERVER.broadcast(Component.text(argsMap.get("message"), NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, true));
     };
     private static Function<String> giveItem = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -110,23 +94,17 @@ public class GptActions {
     }
 
     public static void executeCommands(String[] commands) {
-        CommandSourceStack commandSourceStack = GPTGOD.SERVER.createCommandSourceStack().withSuppressedOutput()
-                .withPermission(4);
-        CommandDispatcher<CommandSourceStack> commanddispatcher = GPTGOD.SERVER.getCommands().getDispatcher();
+        CommandSender console = GPTGOD.SERVER.getConsoleSender();
         for (String command : commands) {
             command = command.charAt(0) == '/' ? command.substring(1) : command;
-            ParseResults<CommandSourceStack> results = commanddispatcher.parse(command, commandSourceStack);
-            GPTGOD.SERVER.getCommands().performCommand(results, command);
+            GPTGOD.SERVER.dispatchCommand(console, command);
         }
     }
 
     public static void executeCommand(String command) {
-        CommandSourceStack commandSourceStack = GPTGOD.SERVER.createCommandSourceStack().withSuppressedOutput()
-                .withPermission(4);
-        CommandDispatcher<CommandSourceStack> commanddispatcher = GPTGOD.SERVER.getCommands().getDispatcher();
+        CommandSender console = GPTGOD.SERVER.getConsoleSender();
         command = command.charAt(0) == '/' ? command.substring(1) : command;
-        ParseResults<CommandSourceStack> results = commanddispatcher.parse(command, commandSourceStack);
-        GPTGOD.SERVER.getCommands().performCommand(results, command);
+        GPTGOD.SERVER.dispatchCommand(console, command);
     }
 
     public static int run(String functionName, String jsonArgs) {

@@ -7,6 +7,7 @@ import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
+import net.bigyous.gptgodmc.utils.DebugCommand;
 
 public final class GPTGOD extends JavaPlugin {
 
@@ -31,6 +32,8 @@ public final class GPTGOD extends JavaPlugin {
         this.getConfig().addDefault("openAiKey", "");
         this.getConfig().addDefault("language", "en");
         this.saveConfig();
+
+        this.getCommand("try").setExecutor(new DebugCommand());
 
     }
 

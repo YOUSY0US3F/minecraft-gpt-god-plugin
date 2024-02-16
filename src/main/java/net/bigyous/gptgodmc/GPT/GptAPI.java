@@ -13,10 +13,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.gson.GsonBuilder;
 
-import net.bigyous.gptgodmc.Config;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptModel;
@@ -24,6 +25,7 @@ import net.bigyous.gptgodmc.GPT.Json.GptRequest;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.ModelSerializer;
 import net.bigyous.gptgodmc.GPT.Json.ParameterExclusion;
+import net.bigyous.gptgodmc.utils.DebugCommand;
 
 public class GptAPI {
     private GsonBuilder gson = new GsonBuilder();
@@ -76,10 +78,11 @@ public class GptAPI {
     }
     public void send(){
         Thread worker = new Thread(()->{
+            FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
             GPTGOD.LOGGER.info("POSTING " + gson.setPrettyPrinting().create().toJson(body));
             HttpPost post = new HttpPost(CHATGPTURL);
-            post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + Config.openAiKey);
+            post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + config.getString("openAiKey"));
             GPTGOD.LOGGER.info("Making POST request");
             post.setEntity(data);
             try {
@@ -102,10 +105,11 @@ public class GptAPI {
     }
     public void send(Map<String,GptFunction> functions){
         Thread worker = new Thread(()->{
+            FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
             GPTGOD.LOGGER.info("POSTING " + gson.setPrettyPrinting().create().toJson(body));
             HttpPost post = new HttpPost(CHATGPTURL);
-            post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + Config.openAiKey);
+            post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + config.getString("openAiKey"));
             GPTGOD.LOGGER.info("Making POST request");
             post.setEntity(data);
             try {
