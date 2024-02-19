@@ -7,3 +7,8 @@ authors: [ "YOUS", "Anders" ]
 description: Minecraft is not so godless anymore...
 website: https://bigyous.net
 depend: [ voicechat ]
+
+commands:
+  try:
+    description: tests out a GPTFunction as if called by OpenAi for debug purposes
+    usage: /try [function name] [Json formatted args]

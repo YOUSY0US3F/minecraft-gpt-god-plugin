@@ -1,38 +1,35 @@
 package net.bigyous.gptgodmc.utils;
 
 import net.bigyous.gptgodmc.interfaces.Function;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService; 
+import java.util.concurrent.Executors; 
+
+class Task<T> implements Runnable
+{
+    private Function<T> task;
+    private T object;
+    public Task(Function<T> task, T object){
+        this.task = task;
+        this.object = object;
+    }
+
+    public void run(){
+        this.task.run(object);
+    }
+}
 
 
 public class TaskQueue<T> {
-    private volatile ConcurrentLinkedQueue<T> queue;
     private Function<T> task;
-    private boolean isExecuting;
-
+    private ExecutorService pool;
     public TaskQueue(Function<T> task){
-        this.queue = new ConcurrentLinkedQueue<T>();
         this.task = task;
-        this.isExecuting = false;
+        this.pool = Executors.newCachedThreadPool();
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void insert(T object){
-        queue.add(object);
-        if(!isExecuting){
-            this.execute();
-        }
-    }
-
-    public void execute(){
-        isExecuting = true;
-        while(!queue.isEmpty()){
-            Thread worker = new Thread(()->{
-                task.run(queue.poll());
-                Thread.currentThread().interrupt();
-            });
-            worker.start();
-        }
-        isExecuting = false;
-        
+        pool.execute(new Task(task, object));
     }
 
 }

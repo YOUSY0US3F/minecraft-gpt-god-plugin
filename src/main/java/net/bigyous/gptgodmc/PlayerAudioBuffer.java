@@ -1,6 +1,7 @@
 package net.bigyous.gptgodmc;
 
 import de.maxhenkel.voicechat.api.mp3.Mp3Encoder;
+import net.bigyous.gptgodmc.utils.PCMtoWAV;
 
 import java.io.IOException;
 
@@ -36,16 +37,25 @@ public class PlayerAudioBuffer {
         this.samples = replace;
     }
 
+    // doesn't work in bukkit
     public void encode(){
         Mp3Encoder encoder = api.createMp3Encoder(AudioFileManager.FORMAT, AudioFileManager.BIT_RATE, 0, AudioFileManager.getPlayerOutputStream(player, this.bufferId));
         try {
             encoder.encode(samples);
             encoder.close();
-            GPTGOD.LOGGER.info(String.format("created mp3 file at: %s", AudioFileManager.getPlayerMp3(player, this.bufferId).toUri().toString()));
+            GPTGOD.LOGGER.info(String.format("created mp3 file at: %s", AudioFileManager.getPlayerFile(player, this.bufferId).toUri().toString()));
         } catch (IOException e) {
             GPTGOD.LOGGER.warn(String.format("An IO Exception occured encoding mp3 file for Player: %s", player.getName()));
         }
         this.samples = new short[] {};
+    }
+
+    public void createWAV(){
+        try {
+            PCMtoWAV.PCMtoFile(AudioFileManager.getPlayerOutputStream(player, this.bufferId), samples, AudioFileManager.SAMPLE_RATE);
+        } catch (IOException e) {
+            GPTGOD.LOGGER.error(String.format("An IO Exception occured encoding mp3 file for Player %s:", player.getName()), e);
+        }
     }
 
     public int getBufferId(){

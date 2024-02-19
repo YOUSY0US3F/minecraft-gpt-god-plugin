@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
     id 'java'
 }
 
@@ -17,6 +18,7 @@ processResources {
 }
 
 dependencies {
+    implementation 'com.github.mizosoft.methanol:methanol:1.7.0'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
     implementation 'commons-io:commons-io:2.15.1'
@@ -28,7 +30,6 @@ dependencies {
     implementation "io.papermc.paper:paper-api:${bukkit_version}"
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'com.github.mizosoft.methanol:methanol:1.7.0'
 }
 
 repositories {
@@ -42,4 +43,12 @@ repositories {
         url = uri("https://papermc.io/repo/repository/maven-public/")
     }
     mavenLocal()
+}
+
+shadowJar {
+    dependencies {
+        include(dependency('org.apache.commons:.*'))
+        include(dependency('com.google.code.gson:.*'))
+        include(dependency('com.github.mizosoft.methanol:.*'))
+    }
 }

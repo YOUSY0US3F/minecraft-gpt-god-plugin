@@ -1,0 +1,10 @@
+# Configuration file for gptgodmc
+# Make sure you update this before running!
+
+# your OpenAi API key from https://platform.openai.com/api-keys
+# the plugin won't work without this
+
+openAiKey: ""
+
+# language in ISO-639 format https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+language: en

@@ -24,16 +24,17 @@ public final class GPTGOD extends JavaPlugin {
         if (service != null) {
             voicechatPlugin = new VoiceMonitorPlugin();
             service.registerPlugin(voicechatPlugin);
-            LOGGER.info("Successfully registered monitor plugin");
+            LOGGER.info("Successfully registered gpt monitor plugin");
         } else {
-            LOGGER.info("Failed to register monitor plugin");
+            LOGGER.info("Failed to register gpt monitor plugin");
         }
-        SERVER = this.getServer();
-        this.getConfig().addDefault("openAiKey", "");
-        this.getConfig().addDefault("language", "en");
-        this.saveConfig();
-
-        this.getCommand("try").setExecutor(new DebugCommand());
+        SERVER = getServer();
+        // getConfig().addDefault("openAiKey", "");
+        // getConfig().addDefault("language", "en");
+        this.saveDefaultConfig();
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        getCommand("try").setExecutor(new DebugCommand());
 
     }
 

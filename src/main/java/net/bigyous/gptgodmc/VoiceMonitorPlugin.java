@@ -45,7 +45,7 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
         buffers = new ConcurrentHashMap<UUID, PlayerAudioBuffer>();
         decoders = new ConcurrentHashMap<UUID, OpusDecoder>();
         encodingQueue = new TaskQueue<PlayerAudioBuffer>((PlayerAudioBuffer buffer) -> {
-            String speech = Transcription.Transcribe(AudioFileManager.getPlayerMp3(buffer.getPlayer(), buffer.getBufferId()));
+            String speech = Transcription.Transcribe(AudioFileManager.getPlayerFile(buffer.getPlayer(), buffer.getBufferId()));
             AudioFileManager.deleteFile(buffer.getPlayer(), buffer.getBufferId());
             GPTGOD.LOGGER.info(String.format("%s said: %s", buffer.getPlayer().getName(), speech));
         });
@@ -70,15 +70,16 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
             return;
         }
         if (!(senderConnection.getPlayer().getPlayer() instanceof Player player)) {
-            GPTGOD.LOGGER.warn("Received microphone packets from non-player");
+            // GPTGOD.LOGGER.warn("Received microphone packets from non-player");
             return;
         }
         if(player.getGameMode() == GameMode.SPECTATOR){
             return;
         }
-        // GPTGOD.LOGGER.info(String.format("Player: %s Sent packet of length: %d", player.getDisplayName().getString(), encodedData.length));
+        GPTGOD.LOGGER.info(String.format("Player: %s Sent packet of length: %d", player.getName(), encodedData.length));
         if (!decoders.containsKey(player.getUniqueId())) {
             decoders.put(player.getUniqueId(), event.getVoicechat().createDecoder());
+            // GPTGOD.LOGGER.info(String.format("opusDecoder created for UUID: %s", player.getUniqueId().toString()));
         }
         OpusDecoder decoder = decoders.get(player.getUniqueId());
         short[] decoded = decoder.decode(event.getPacket().getOpusEncodedData());
@@ -87,14 +88,16 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
             if(!buffers.containsKey(player.getUniqueId())){
                 PlayerAudioBuffer buffer = new PlayerAudioBuffer(decoded, player, event.getVoicechat());
                 buffers.put(player.getUniqueId(), buffer);
+                // GPTGOD.LOGGER.info(String.format("AudioBuffer #%d created for UUID: %s", buffer.getBufferId(), player.getUniqueId().toString()));
             }
             else{
                 buffers.get(player.getUniqueId()).addSamples(decoded);
             }
         }
         else{
+            // GPTGOD.LOGGER.info(String.format("decoders: %s, buffers: %s", decoders.toString(), buffers.toString()));
             PlayerAudioBuffer toBeProcessed = buffers.get(player.getUniqueId());
-            toBeProcessed.encode();
+            toBeProcessed.createWAV();
             encodingQueue.insert(toBeProcessed);
             buffers.remove(player.getUniqueId());
             decoder.resetState();
@@ -110,14 +113,13 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
     }
 
     private void cleanUpPlayer(UUID uuid, VoicechatServerApi vc){
-        UUID playerUuid = uuid;
-        if (vc.getConnectionOf(playerUuid).getPlayer().getPlayer() instanceof Player player){
-            AudioFileManager.deletePlayerData(player);
-        }
-        if(!decoders.contains(playerUuid)){
+
+        AudioFileManager.deletePlayerData(uuid);
+        if(!decoders.containsKey(uuid)){
+            GPTGOD.LOGGER.info(String.format("Cleaned up data for UUID: %s, there was no decoder to clean", uuid.toString()));
             return;
         }
-        decoders.get(playerUuid).close();
+        decoders.get(uuid).close();
         decoders.remove(uuid);
         GPTGOD.LOGGER.info(String.format("Cleaned up data for UUID: %s", uuid.toString()));
     }
