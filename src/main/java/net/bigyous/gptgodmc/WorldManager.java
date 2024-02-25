@@ -77,7 +77,9 @@ public class WorldManager {
 
     public static void teleportPlayer(Player player){
         if(!hasWorldLoaded()) return;
+        player.setRespawnLocation(currentGameMap.getWorld().getSpawnLocation(), true);
         player.teleport(currentGameMap.getWorld().getSpawnLocation());
+        
     }
 
 }

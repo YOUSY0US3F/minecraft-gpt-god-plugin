@@ -24,12 +24,24 @@ public class RoundSystem implements Listener {
             }
        }
 
-       WorldManager.resetCurrentMap();
+       reset();
 
     }
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         WorldManager.teleportPlayer(event.getPlayer());
+    }
+
+    public static void reset(){
+        WorldManager.resetCurrentMap();
+        for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
+            revivePlayer(p);
+        }
+    }
+
+    public static void revivePlayer(Player player){
+            WorldManager.teleportPlayer(player);
+            player.setGameMode(GameMode.SURVIVAL);
     }
 }
