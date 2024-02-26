@@ -30,7 +30,7 @@ public class GptActions {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        Player player = GPTGOD.SERVER.getPlayer(argsMap.get("playerName"));
+        Player player = GPTGOD.SERVER.getPlayerExact(argsMap.get("playerName"));
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
         player.sendMessage(argsMap.get("message"));
     };
