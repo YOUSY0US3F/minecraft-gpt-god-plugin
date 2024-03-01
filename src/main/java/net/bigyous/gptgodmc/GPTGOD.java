@@ -56,6 +56,7 @@ public final class GPTGOD extends JavaPlugin {
             }
             
         }
+        SERVER.getPluginManager().registerEvents(new LoggableEventHandler(), this);
         
 
     }
