@@ -9,6 +9,9 @@ public class GPTUtils {
     private static Encoding encoding = registry.getEncoding(EncodingType.CL100K_BASE);
 
     public static int countTokens(String message){
+        if(message == null){
+            return 0;
+        }
         return encoding.countTokens(message);
     }
 }

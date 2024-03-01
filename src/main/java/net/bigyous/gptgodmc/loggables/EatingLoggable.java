@@ -5,19 +5,15 @@ import org.bukkit.event.player.PlayerItemConsumeEvent;
 import net.kyori.adventure.text.TextComponent;
 
 public class EatingLoggable extends BaseLoggable{
-    private String entityName;
-    private String itemName;
-    private boolean isValid;
+    protected String entityName;
+    protected String itemName;
     public EatingLoggable(PlayerItemConsumeEvent event){
        this.entityName = event.getPlayer().getName();
-       this.itemName = ((TextComponent)event.getItem().displayName()).content();
+       this.itemName = event.getItem().getType().toString();
     }    
 
     @Override
     public String getLog() {
-        if (!isValid){
-            return null;
-        }
         return entityName + " consumed " + itemName;
     }
 

@@ -12,12 +12,15 @@ public class ServerInfoSummarizer {
     public static String getInventoryInfo(Player player) {
         StringBuilder sb = new StringBuilder();
         // Armor Items
-        ItemStack head = player.getInventory().getHelmet();
-        ItemStack chest = player.getInventory().getChestplate();
-        ItemStack legs = player.getInventory().getLeggings();
-        ItemStack feet = player.getInventory().getBoots();
-
-        sb.append("Armor: " + formatItemStack(head) + ", " + formatItemStack(chest) + ", " + formatItemStack(legs) + ", " + formatItemStack(feet) + "\n");
+        StringBuilder armorString = new StringBuilder();
+        for(ItemStack armor: player.getInventory().getArmorContents()){
+            if(armor!=null){
+                armorString.append(formatItemStack(armor) + ", ");
+            }
+        }
+        if(!armorString.isEmpty()){
+            sb.append("Armor: " + armorString.toString() + "\n");
+        }
 
         // Inventory Items
         // sb.append("Inventory: ");
@@ -32,16 +35,16 @@ public class ServerInfoSummarizer {
         // Equipped Item (Main Hand)
         ItemStack main = player.getInventory().getItemInMainHand();
         ItemStack off = player.getInventory().getItemInOffHand();
-        sb.append(String.format("Main Hand: %s, Off Hand %s", formatItemStack(main), formatItemStack(off)));
+        sb.append(String.format("Main Hand: %s, Off Hand %s\n", formatItemStack(main), formatItemStack(off)));
         return sb.toString();
     }
 
     private static String formatItemStack(ItemStack stack) {
-        if (stack.isEmpty()) {
+        if (stack == null || stack.isEmpty()) {
             return "None";
         }
         //stack.getItem()
-        return ((TextComponent) stack.getItemMeta().displayName()).content();
+        return stack.getType().toString();
     }
     private static String getPlayerHealth(Player player){
         double maxHealth = player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
@@ -71,7 +74,7 @@ public class ServerInfoSummarizer {
             String inventoryInfo = getInventoryInfo(player);
 
             sb.append("Status of Player " + name + ":\n");
-            sb.append("Health: " + health);
+            sb.append("Health: " + health + '\n');
             // sb.append("\tDead? " + isDead + "\n");
             // sb.append("\tInventory: " + inventoryInfo + "\n");
             // sb.append(isDead? "Dead\n" : "Alive\n");

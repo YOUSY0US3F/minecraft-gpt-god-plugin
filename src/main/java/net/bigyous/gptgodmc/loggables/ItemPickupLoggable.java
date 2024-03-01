@@ -41,7 +41,7 @@ public class ItemPickupLoggable extends BaseLoggable {
 
     @Override
     public String getLog() {
-        StringBuilder sb = new StringBuilder(getFormattedTimestamp() + playerName + " picked up: ");
+        StringBuilder sb = new StringBuilder(playerName + " picked up: ");
         
         for (Pickup p : pickups) {
             sb.append(p.itemName + " x" + p.amount + ", ");

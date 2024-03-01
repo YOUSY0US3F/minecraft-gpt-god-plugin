@@ -43,14 +43,13 @@ public class LoggableEventHandler implements Listener {
 
         EventLogger.addLoggable(new ChatLoggable(event.getPlayer().getName(), ((TextComponent)event.message()).content()));
         // dbg: dump logs
-        System.out.println("=== DUMPED LOGS: ===");
-        System.out.println(EventLogger.dump());
-        System.out.println("====================");
+        GPTGOD.LOGGER.info("=== DUMPED LOGS: ===");
+        GPTGOD.LOGGER.info(EventLogger.dump());
+        GPTGOD.LOGGER.info("====================");
     }
 
     @EventHandler
     public static void onAttackEntity(EntityDamageByEntityEvent event) {
-        System.out.println("Entity attacked");
         EventLogger.addLoggable(
             new AttackLoggable(event)
         );
@@ -58,7 +57,6 @@ public class LoggableEventHandler implements Listener {
 
     @EventHandler
     public static void onDamage(EntityDamageEvent event) {
-        System.out.println("Entity damaged");
         EventLogger.addLoggable(
             new DamageLoggable(event)
         );
@@ -66,7 +64,6 @@ public class LoggableEventHandler implements Listener {
 
     @EventHandler
     public static void onDrop(PlayerDropItemEvent event) {
-        System.out.println("Item tossed");
         EventLogger.addLoggable(
             new DropItemLoggable(event)
         );
@@ -77,12 +74,12 @@ public class LoggableEventHandler implements Listener {
             new EatingLoggable(event)
         );
     }
-    @EventHandler
-    public static void onEntityInteract(PlayerInteractEvent event){
-        EventLogger.addLoggable(
-            new InteractLoggable(event)
-        );
-    }
+    // @EventHandler
+    // public static void onEntityInteract(PlayerInteractEvent event){
+    //     EventLogger.addLoggable(
+    //         new InteractLoggable(event)
+    //     );
+    // }
     @EventHandler
     public static void onDeath(PlayerDeathEvent event){
         EventLogger.addLoggable(
