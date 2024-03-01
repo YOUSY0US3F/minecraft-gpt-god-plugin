@@ -30,6 +30,8 @@ dependencies {
     implementation "io.papermc.paper:paper-api:${bukkit_version}"
     implementation "de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}"
     implementation 'com.google.code.gson:gson:2.10.1'
+    implementation group: 'com.knuddels', name: 'jtokkit', version: '1.0.0'
+
 }
 
 repositories {
@@ -50,5 +52,6 @@ shadowJar {
         include(dependency('org.apache.commons:.*'))
         include(dependency('com.google.code.gson:.*'))
         include(dependency('com.github.mizosoft.methanol:.*'))
+        include(dependency('com.knuddels:.*'))
     }
 }

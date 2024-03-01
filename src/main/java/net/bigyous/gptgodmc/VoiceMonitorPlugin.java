@@ -5,6 +5,7 @@ import net.bigyous.gptgodmc.utils.TaskQueue;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import net.bigyous.gptgodmc.GPT.Transcription;
+import net.bigyous.gptgodmc.loggables.ChatLoggable;
 import de.maxhenkel.voicechat.api.ForgeVoicechatPlugin;
 import de.maxhenkel.voicechat.api.VoicechatApi;
 import de.maxhenkel.voicechat.api.VoicechatPlugin;
@@ -48,6 +49,7 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
             String speech = Transcription.Transcribe(AudioFileManager.getPlayerFile(buffer.getPlayer(), buffer.getBufferId()));
             AudioFileManager.deleteFile(buffer.getPlayer(), buffer.getBufferId());
             GPTGOD.LOGGER.info(String.format("%s said: %s", buffer.getPlayer().getName(), speech));
+            EventLogger.addLoggable(new ChatLoggable(buffer.getPlayer().getName(), speech));
         });
     }
 
