@@ -40,6 +40,7 @@ public class GameLoop {
         GPTGOD.SERVER.getScheduler().cancelTask(taskId);
         GPT_API = new GptAPI(GPTModels.getMainModel());
         isRunning = false;
+        GPTGOD.LOGGER.info("GameLoop Stoppped");
     }
 
     private static class GPTTask implements Runnable{
