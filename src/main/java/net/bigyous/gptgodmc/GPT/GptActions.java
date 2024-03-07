@@ -7,6 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.bigyous.gptgodmc.GPTGOD;
+import net.bigyous.gptgodmc.WorldManager;
 import net.bigyous.gptgodmc.GPT.Json.Choice;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptResponse;
@@ -25,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
 public class GptActions {
+    private int tokens = -1;
     private static Gson gson = new Gson();
     private static Function<String> whisper = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -97,14 +99,14 @@ public class GptActions {
         CommandSender console = GPTGOD.SERVER.getConsoleSender();
         for (String command : commands) {
             command = command.charAt(0) == '/' ? command.substring(1) : command;
-            GPTGOD.SERVER.dispatchCommand(console, command);
+            GPTGOD.SERVER.dispatchCommand(console, String.format("execute in %s %s", WorldManager.getDimensionName(), command));
         }
     }
 
     public static void executeCommand(String command) {
         CommandSender console = GPTGOD.SERVER.getConsoleSender();
         command = command.charAt(0) == '/' ? command.substring(1) : command;
-        GPTGOD.SERVER.dispatchCommand(console, command);
+        GPTGOD.SERVER.dispatchCommand(console, String.format("execute in %s %s", WorldManager.getDimensionName(), command));
     }
 
     public static int run(String functionName, String jsonArgs) {
@@ -129,6 +131,21 @@ public class GptActions {
                 functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());
             }
         }
+    }
+
+    private int calculateFunctionTokens(){
+        int sum = 0;
+        for(GptFunction function  : functionMap.values()){
+            sum+= function.calculateFunctionTokens();
+        }
+        return sum;
+    }
+
+    public int getTokens(){
+        if(tokens >= 0){
+            return tokens;
+        }
+        return calculateFunctionTokens();
     }
 
 }

@@ -76,6 +76,12 @@ public class GptAPI {
     public void removeLastMessage(){
         this.body.removeLastMessage();
     }
+    public int getMaxTokens(){
+        return body.getModel().getTokenLimit();
+    }
+    public String getModelName(){
+        return body.getModel().getName();
+    }
     public void send(){
         Thread worker = new Thread(()->{
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();

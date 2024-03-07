@@ -18,4 +18,8 @@ public interface Loggable {
     public boolean combine(Loggable l);
 
     public Instant getRawInstant();
+
+    public int getTokens();
+
+    public void resetTokens();
 }

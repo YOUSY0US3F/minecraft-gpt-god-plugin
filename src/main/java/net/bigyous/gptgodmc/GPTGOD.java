@@ -9,7 +9,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
-
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -57,9 +62,11 @@ public final class GPTGOD extends JavaPlugin {
             
         }
         SERVER.getPluginManager().registerEvents(new LoggableEventHandler(), this);
-        
+        SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
 
     }
+
+
 
     @Override
     public void onDisable() {
@@ -67,6 +74,28 @@ public final class GPTGOD extends JavaPlugin {
         if (voicechatPlugin != null) {
             getServer().getServicesManager().unregister(voicechatPlugin);
             LOGGER.info("Successfully unregistered monitor plugin");
+        }
+    }
+
+    private static class StartGameLoop implements Listener{
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event){
+            GameLoop.init();
+            GPTGOD.LOGGER.info("GameLoop Started, the minecraft god has awoken");
+        }
+
+        @EventHandler
+        public void onPlayerDisconnect(PlayerQuitEvent event){ 
+            GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
+        }
+        private static class StopGPT implements Runnable{
+
+            @Override
+            public void run() {
+                GameLoop.stop();
+                GPTGOD.LOGGER.info("All players Left, GameLoop stopped");
+            }
+            
         }
     }
 }

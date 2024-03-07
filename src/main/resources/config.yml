@@ -20,3 +20,11 @@ Rounds: true
 # worlds are stored in plugins/gptgodmc/worlds
 # if empty or invalid the Round System won't work
 startingWorld: ""
+
+# if set to true, the plugin will use the newest GPT-4 release
+# if set to false the plugin will use GPT 3.5
+# GPT 4 is not too expensive these days but you can save a bit of money by using 3.5 instead
+use-gpt-4: false
+
+# this will be the prompt provided to Chat-GPT
+prompt: "You are the god of a small minecraft island world, the players inhabiting the island have little resources. Use the information provided in the logs and the tools provided to help, punish, or reward them as you see fit. you are only allowed to use tool calls"

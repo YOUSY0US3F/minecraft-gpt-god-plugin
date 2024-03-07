@@ -62,7 +62,7 @@ public class ServerInfoSummarizer {
         return "Unknown";
     }
     public static String getStatusSummary() {
-        StringBuilder sb = new StringBuilder("=== Server Status ===\n");
+        StringBuilder sb = new StringBuilder("Server Status:\n");
 
         for (Player player : GPTGOD.SERVER.getOnlinePlayers()) {
             //player.getP
@@ -80,9 +80,7 @@ public class ServerInfoSummarizer {
             // sb.append(isDead? "Dead\n" : "Alive\n");
             sb.append(isSleeping? "Asleep\n" : "");
             sb.append(inventoryInfo + "\n");
-        }
-
-        sb.append("==================");
+        };
         return sb.toString();
     }
 }

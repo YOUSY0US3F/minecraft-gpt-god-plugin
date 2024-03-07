@@ -82,4 +82,8 @@ public class WorldManager {
         
     }
 
+    public static String getDimensionName(){
+        return "minecraft:"+currentGameMap.getWorld().getName();
+    }
+
 }
