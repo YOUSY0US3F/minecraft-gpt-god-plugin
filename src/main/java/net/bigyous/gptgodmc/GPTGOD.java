@@ -81,7 +81,7 @@ public final class GPTGOD extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event){
             GameLoop.init();
-            GPTGOD.LOGGER.info("GameLoop Started, the minecraft god has awoken");
+            
         }
 
         @EventHandler
@@ -92,8 +92,8 @@ public final class GPTGOD extends JavaPlugin {
 
             @Override
             public void run() {
+                GPTGOD.LOGGER.info("All players Left, stopping gameLoop");
                 GameLoop.stop();
-                GPTGOD.LOGGER.info("All players Left, GameLoop stopped");
             }
             
         }

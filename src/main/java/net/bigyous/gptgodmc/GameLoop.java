@@ -34,6 +34,7 @@ public class GameLoop {
             GPTGOD.LOGGER.error("no prompt set in config file, the plugin wont work as intended!");
         }
         isRunning = true;
+        GPTGOD.LOGGER.info("GameLoop Started, the minecraft god has awoken");
     }
     public static void stop(){
         if(!isRunning) return;
