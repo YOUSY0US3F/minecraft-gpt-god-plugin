@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.bigyous.gptgodmc.utils.CompareLoggables;
+import net.bigyous.gptgodmc.utils.GPTUtils;
 import net.bigyous.gptgodmc.loggables.Loggable;
 
 public class EventLogger {
@@ -35,7 +36,8 @@ public class EventLogger {
 
     // remove logs until the total tokens fits within the limit of 
     public static void cull(int tokenLimit){
-        while(totalTokens > tokenLimit){
+        int serverInfoTokens = GPTUtils.countTokens(ServerInfoSummarizer.getStatusSummary());
+        while(totalTokens + serverInfoTokens > tokenLimit){
             Loggable oldest = loggables.first();
             totalTokens -= oldest.getTokens();
             loggables.remove(oldest);
