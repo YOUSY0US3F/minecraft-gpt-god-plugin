@@ -2,7 +2,7 @@ package net.bigyous.gptgodmc.GPT.Json;
 
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.interfaces.Function;
-
+import net.bigyous.gptgodmc.utils.GPTUtils;
 import java.util.Map;
 
 public class GptFunction {
@@ -50,6 +50,11 @@ public class GptFunction {
         GPTGOD.LOGGER.info(String.format("%s invoked", this.name));
         function.run(jsonArgs);
     }
+
+    public int calculateFunctionTokens(){
+        return GPTUtils.countTokens(name) + GPTUtils.countTokens(description) + parameters.calculateParameterTokens();
+
+    }
 }
 
 class FunctionParameters {
@@ -75,6 +80,14 @@ class FunctionParameters {
 
     public void setProperties(Map<String, Parameter> properties) {
         this.properties = properties;
+    }
+
+    public int calculateParameterTokens(){
+        int sum = 0;
+        for(Parameter param: properties.values()){
+            sum+= GPTUtils.countTokens(param.getType()) + GPTUtils.countTokens(param.getDescription());
+        }
+        return sum;
     }
 }
 

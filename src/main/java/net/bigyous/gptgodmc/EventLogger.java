@@ -4,12 +4,13 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.bigyous.gptgodmc.utils.CompareLoggables;
+import net.bigyous.gptgodmc.utils.GPTUtils;
 import net.bigyous.gptgodmc.loggables.Loggable;
 
 public class EventLogger {
     // private static List<Loggable> loggables = new ArrayList<>();
     private static TreeSet<Loggable> loggables = new TreeSet<>(new CompareLoggables());
-
+    private static int totalTokens = 0;
     public static void addLoggable(Loggable event) {
         if (loggables.size() > 0) {
             Loggable last = loggables.last();
@@ -17,10 +18,29 @@ public class EventLogger {
             if (!last.combine(event)) {
                 // if not combined, add to list
                 loggables.add(event);
+                // calculate the tokens ahead of time
+                totalTokens += event.getTokens();
+            }
+            else{
+                // adjust total tokens after combining logs
+                totalTokens -= last.getTokens();
+                last.resetTokens();
+                totalTokens += last.getTokens();
             }
         } else {
             // If empty, just add
             loggables.add(event);
+            totalTokens += event.getTokens();
+        }
+    }
+
+    // remove logs until the total tokens fits within the limit of 
+    public static void cull(int tokenLimit){
+        int serverInfoTokens = GPTUtils.countTokens(ServerInfoSummarizer.getStatusSummary());
+        while(totalTokens + serverInfoTokens > tokenLimit){
+            Loggable oldest = loggables.first();
+            totalTokens -= oldest.getTokens();
+            loggables.remove(oldest);
         }
     }
 

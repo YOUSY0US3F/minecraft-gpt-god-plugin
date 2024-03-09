@@ -19,6 +19,7 @@ import de.maxhenkel.voicechat.api.opus.OpusDecoder;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.UUID;
+import java.time.Instant;
 
 @ForgeVoicechatPlugin
 public class VoiceMonitorPlugin implements VoicechatPlugin {
@@ -46,10 +47,11 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
         buffers = new ConcurrentHashMap<UUID, PlayerAudioBuffer>();
         decoders = new ConcurrentHashMap<UUID, OpusDecoder>();
         encodingQueue = new TaskQueue<PlayerAudioBuffer>((PlayerAudioBuffer buffer) -> {
+            Instant timestamp = Instant.now();
             String speech = Transcription.Transcribe(AudioFileManager.getPlayerFile(buffer.getPlayer(), buffer.getBufferId()));
             AudioFileManager.deleteFile(buffer.getPlayer(), buffer.getBufferId());
             GPTGOD.LOGGER.info(String.format("%s said: %s", buffer.getPlayer().getName(), speech));
-            EventLogger.addLoggable(new ChatLoggable(buffer.getPlayer().getName(), speech));
+            EventLogger.addLoggable(new ChatLoggable(buffer.getPlayer().getName(), speech, timestamp));
         });
     }
 
