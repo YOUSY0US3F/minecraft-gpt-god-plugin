@@ -21,7 +21,7 @@ public class GameLoop {
         return seconds * 20;
     }
     public static void init(){
-        if(isRunning) return;
+        if(isRunning || !config.getBoolean("enabled")) return;
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimer(plugin, new GPTTask(), seconds(30), seconds(40));
         taskId = task.getTaskId();
         if(config.contains("prompt") && !config.getString("prompt").isBlank()){

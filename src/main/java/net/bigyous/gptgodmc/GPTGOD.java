@@ -63,6 +63,7 @@ public final class GPTGOD extends JavaPlugin {
         }
         SERVER.getPluginManager().registerEvents(new LoggableEventHandler(), this);
         SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
+        SERVER.getPluginManager().registerEvents(new StructureManager(), this);
 
     }
 
