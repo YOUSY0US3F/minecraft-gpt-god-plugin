@@ -2,6 +2,7 @@ package net.bigyous.gptgodmc;
 
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -109,6 +110,26 @@ public class StructureManager implements Listener {
         }
         else{
             return "";
+        }
+    }
+
+    public static Map<String, Integer> getStructureProximityData(Player player){
+        if(getStructures().isEmpty()) return null;
+        int distance = Integer.MAX_VALUE;
+        String closest = "";
+        Location playerLocation = player.getLocation();
+        for(String key : getStructures()){
+            int temp = Math.toIntExact(Math.round(playerLocation.distance(structures.get(key).getLocation())));
+            if(temp< distance){
+                distance = temp;
+                closest = key;
+            }
+        }
+        if(distance < 50){
+            return Map.of(closest, distance);
+        }
+        else{
+            return null;
         }
     }
 }
