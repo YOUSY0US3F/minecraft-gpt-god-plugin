@@ -1,13 +1,10 @@
 package net.bigyous.gptgodmc;
 
-import java.util.List;
-
 import org.bukkit.GameMode;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import net.kyori.adventure.text.TextComponent;
 public class ServerInfoSummarizer {
     public static String getInventoryInfo(Player player) {
         StringBuilder sb = new StringBuilder();
@@ -39,6 +36,14 @@ public class ServerInfoSummarizer {
         return sb.toString();
     }
 
+    private static String getStructures(){
+        StringBuilder sb = new StringBuilder();
+        for(String structure : StructureManager.getStructures()){
+            sb.append(String.format("%s: builder: %s, ", structure, StructureManager.getStructure(structure).getBuilder().getName()));
+        }
+        return sb.toString();
+    }
+
     private static String formatItemStack(ItemStack stack) {
         if (stack == null || stack.isEmpty()) {
             return "None";
@@ -63,7 +68,7 @@ public class ServerInfoSummarizer {
     }
     public static String getStatusSummary() {
         StringBuilder sb = new StringBuilder("Server Status:\n");
-
+        sb.append("Structures: " + getStructures() + "\n");
         for (Player player : GPTGOD.SERVER.getOnlinePlayers()) {
             //player.getP
             String name = player.getName();

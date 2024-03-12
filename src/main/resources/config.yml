@@ -28,3 +28,6 @@ use-gpt-4: false
 
 # this will be the prompt provided to Chat-GPT
 prompt: "You are the god of a small minecraft island world, the players inhabiting the island have little resources. Use the information provided in the logs and the tools provided to help, punish, or reward them as you see fit. you are only allowed to use tool calls. Do not ask for confirmation or permission just act."
+
+# whether or not the mod will make calls to GPT
+enabled: true
