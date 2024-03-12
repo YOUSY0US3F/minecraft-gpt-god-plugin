@@ -88,4 +88,27 @@ public class StructureManager implements Listener {
             }
         }
     }
+
+    public static String getClosestStructureToPlayer(Player player){
+        if(getStructures().isEmpty()) return "";
+        int distance = Integer.MAX_VALUE;
+        String closest = "";
+        Location playerLocation = player.getLocation();
+        for(String key : getStructures()){
+            int temp = Math.toIntExact(Math.round(playerLocation.distance(structures.get(key).getLocation())));
+            if(temp< distance){
+                distance = temp;
+                closest = key;
+            }
+        }
+        if(distance < 10){
+            return String.format("Location: near %s", closest);
+        }
+        else if(distance < 50){
+            return String.format("Location: %d blocks away from %s", closest);
+        }
+        else{
+            return "";
+        }
+    }
 }

@@ -80,6 +80,7 @@ public class ServerInfoSummarizer {
 
             sb.append("Status of Player " + name + ":\n");
             sb.append("Health: " + health + '\n');
+            sb.append(StructureManager.getClosestStructureToPlayer(player));
             // sb.append("\tDead? " + isDead + "\n");
             // sb.append("\tInventory: " + inventoryInfo + "\n");
             // sb.append(isDead? "Dead\n" : "Alive\n");
