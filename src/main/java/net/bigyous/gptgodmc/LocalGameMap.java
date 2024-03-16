@@ -33,9 +33,6 @@ public class LocalGameMap {
             GPTGOD.LOGGER.error("Loading GameMap Failed", e);
             return false;
         }
-        while(Bukkit.isTickingWorlds()){
-            Thread.onSpinWait();
-        }
         this.bukkitWorld = Bukkit.createWorld( new WorldCreator(activeWorldFolder.getName()));
 
         if(bukkitWorld != null){
@@ -46,9 +43,6 @@ public class LocalGameMap {
 
     
     public void unload() {
-        while(Bukkit.isTickingWorlds()){
-            Thread.onSpinWait();
-        }
         if (bukkitWorld != null) Bukkit.unloadWorld(bukkitWorld, false);
         if (activeWorldFolder != null){
             try {

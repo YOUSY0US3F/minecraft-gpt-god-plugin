@@ -1,6 +1,7 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -66,8 +67,14 @@ public class ServerInfoSummarizer {
         }
         return "Unknown";
     }
+    private static String getWeather(){
+        World world = WorldManager.getCurrentWorld();
+        return String.format("%s %s", world.isThundering()? "Thunder" : "", world.isClearWeather()? "Clear" : "Storm");
+    }
     public static String getStatusSummary() {
         StringBuilder sb = new StringBuilder("Server Status:\n");
+        sb.append(String.format("Time of day: %s\n", WorldManager.getCurrentWorld().isDayTime() ? "Day": "Night"));
+        sb.append(String.format("Weather: %s\n", getWeather()));
         sb.append("Structures: " + getStructures() + "\n");
         for (Player player : GPTGOD.SERVER.getOnlinePlayers()) {
             //player.getP
@@ -80,7 +87,7 @@ public class ServerInfoSummarizer {
 
             sb.append("Status of Player " + name + ":\n");
             sb.append("Health: " + health + '\n');
-            sb.append(StructureManager.getClosestStructureToPlayer(player));
+            sb.append(StructureManager.getClosestStructureToLocation(player.getLocation()));
             // sb.append("\tDead? " + isDead + "\n");
             // sb.append("\tInventory: " + inventoryInfo + "\n");
             // sb.append(isDead? "Dead\n" : "Alive\n");

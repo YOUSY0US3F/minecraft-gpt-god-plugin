@@ -1,10 +1,17 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntityMountEvent;
+import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -12,20 +19,22 @@ import org.bukkit.event.Listener;
 import net.bigyous.gptgodmc.loggables.AttackLoggable;
 import net.bigyous.gptgodmc.loggables.DamageLoggable;
 import net.bigyous.gptgodmc.loggables.ItemPickupLoggable;
-import net.bigyous.gptgodmc.loggables.Loggable;
+import net.bigyous.gptgodmc.loggables.MountLoggable;
+import net.bigyous.gptgodmc.loggables.SleepTogetherLoggable;
+import net.bigyous.gptgodmc.loggables.SpecialBlockPlaceEventLoggable;
+import net.bigyous.gptgodmc.loggables.UseLoggable;
+import net.bigyous.gptgodmc.loggables.WriteOnSignLoggable;
 import net.kyori.adventure.text.TextComponent;
 import net.bigyous.gptgodmc.loggables.FishingLoggable;
 import net.bigyous.gptgodmc.loggables.DropItemLoggable;
 import net.bigyous.gptgodmc.loggables.DeathLoggable;
 import net.bigyous.gptgodmc.loggables.EatingLoggable;
+import net.bigyous.gptgodmc.loggables.ExplosionLoggable;
 import net.bigyous.gptgodmc.loggables.ChatLoggable;
-import net.bigyous.gptgodmc.loggables.InteractLoggable;
+import net.bigyous.gptgodmc.loggables.CombustLoggable;
 import io.papermc.paper.event.player.AsyncChatEvent;
 
-import java.util.Comparator;
-
 import org.bukkit.event.EventHandler;
-import net.bigyous.gptgodmc.EventLogger;
 
 public class LoggableEventHandler implements Listener {
     //private EventLogger eventLogger;
@@ -91,5 +100,47 @@ public class LoggableEventHandler implements Listener {
         EventLogger.addLoggable(
             new FishingLoggable(event)
         );
+    }
+
+    @EventHandler
+    public static void onBlockPlaced(BlockPlaceEvent event){
+        EventLogger.addLoggable(
+            new SpecialBlockPlaceEventLoggable(event)
+        );
+    }
+
+    @EventHandler
+    public static void onSignChange(SignChangeEvent event){
+        EventLogger.addLoggable(new WriteOnSignLoggable(event));
+    }
+
+    @EventHandler
+    public static void onExplosion(BlockExplodeEvent event){
+        EventLogger.addLoggable(new ExplosionLoggable(event));
+    }
+
+    @EventHandler
+    public static void onSleep(PlayerBedEnterEvent event){
+        EventLogger.addLoggable(new SleepTogetherLoggable(event));
+    }
+
+    @EventHandler
+    public static void onUse(PlayerInteractEvent event){
+        EventLogger.addLoggable(new UseLoggable(event));
+    }
+
+    @EventHandler
+    public static void onBlockExplosion(EntityExplodeEvent event){
+        EventLogger.addLoggable(new ExplosionLoggable(event));
+    }
+
+    @EventHandler
+    public static void onCombust(EntityCombustByEntityEvent event){
+        EventLogger.addLoggable(new CombustLoggable(event));
+    }
+
+    @EventHandler
+    public static void onMount(EntityMountEvent event){
+        EventLogger.addLoggable(new MountLoggable(event));
     }
 }

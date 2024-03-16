@@ -3,9 +3,12 @@ package net.bigyous.gptgodmc.GPT;
 import java.util.Collections;
 import java.util.Map;
 
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
+import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.WorldManager;
 import net.bigyous.gptgodmc.GPT.Json.Choice;
@@ -15,7 +18,7 @@ import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.Parameter;
 import net.bigyous.gptgodmc.GPT.Json.ToolCall;
 import net.bigyous.gptgodmc.interfaces.Function;
-
+import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -28,6 +31,7 @@ import com.google.gson.reflect.TypeToken;
 public class GptActions {
     private int tokens = -1;
     private static Gson gson = new Gson();
+
     private static Function<String> whisper = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
@@ -35,6 +39,7 @@ public class GptActions {
         Player player = GPTGOD.SERVER.getPlayerExact(argsMap.get("playerName"));
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
         player.sendMessage(argsMap.get("message"));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("You whispered %s to %s",argsMap.get("message"), argsMap.get("playerName"))));
     };
     private static Function<String> announce = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -42,19 +47,24 @@ public class GptActions {
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW).decoration(TextDecoration.BOLD, true));
         GPTGOD.SERVER.broadcast(Component.text(argsMap.get("message"), NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, true));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("You announced %s",argsMap.get("message") )));
     };
     private static Function<String> giveItem = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
         String itemId = gson.fromJson(argObject.get("itemId"), String.class);
         int count = gson.fromJson(argObject.get("count"), Integer.class);
-        executeCommand(String.format("/give %s %s %d", playerName, itemId, count));
+        //executeCommand(String.format("/give %s %s %d", playerName, itemId, count));
+        if(Material.matchMaterial(itemId) == null) return;
+        GPTGOD.SERVER.getPlayer(playerName).getInventory().addItem(new ItemStack(Material.matchMaterial(itemId), count));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("You gave %d %s to %s", count, itemId, playerName ) ));
     };
-    private static Function<String> custom = (String args) -> {
+    private static Function<String> command = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         GenerateCommands.generate(argsMap.get("prompt"));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("You commanded for \"%s\" to happen", argsMap.get("prompt") ) ));
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("whisper", new GptFunction("whisper", "send a private message to a player",
@@ -67,14 +77,14 @@ public class GptActions {
 
             Map.entry("giveItem", new GptFunction("giveItem", "give a player any amount of an item",
                     Map.of("playerName", new Parameter("string", "name of the Player"),
-                            "itemId", new Parameter("string", "the minecraft string based id of the item"),
+                            "itemId", new Parameter("string", "the name of the minecraft item"),
                             "count", new Parameter("number", "amount of the item")),
                     giveItem)),
 
-            Map.entry("custom", new GptFunction("custom",
+            Map.entry("command", new GptFunction("command",
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
-                    custom)));
+                    command)));
 
     private static GptTool[] tools = new GptTool[functionMap.size()];
 

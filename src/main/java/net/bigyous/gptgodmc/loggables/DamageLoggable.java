@@ -26,7 +26,7 @@ public class DamageLoggable extends BaseLoggable {
         if (!isValid){
             return null;
         }
-        return entityName + " took " + damageAmount + " damage from " + damageSource;
+        return entityName + " took " + Math.round(damageAmount) + " damage from " + damageSource;
     }
 
     @Override
