@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import org.bukkit.GameRule;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -46,6 +47,10 @@ public class WorldManager {
             currentGameMap = map;
             worldCurrentlyLoaded = true;
             GPTGOD.LOGGER.info(String.format("Map %s has been loaded", mapName));
+            currentGameMap.getWorld().setGameRule(GameRule.MOB_GRIEFING, true);
+            currentGameMap.getWorld().setGameRule(GameRule.DO_MOB_SPAWNING, true);
+            currentGameMap.getWorld().setGameRule(GameRule.DO_WEATHER_CYCLE, true);
+            currentGameMap.getWorld().setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
             return true;
         }
         else{

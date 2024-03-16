@@ -64,7 +64,6 @@ public class Structure {
                 for(int zDirection: directions){
                     Vector location = new Vector(block.getX() + xDirection, block.getY() + yDirection, block.getZ() + zDirection);
                     if(blocks.contains(location)){
-                        GPTGOD.LOGGER.info("connected block!");
                         return true;
                     }
                 }

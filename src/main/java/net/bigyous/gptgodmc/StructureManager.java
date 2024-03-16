@@ -13,6 +13,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+
+import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
+
 import org.bukkit.entity.Player;
 
 public class StructureManager implements Listener {
@@ -36,7 +41,21 @@ public class StructureManager implements Listener {
     }
 
     @EventHandler
+    public void onBlockBurn(BlockBurnEvent event){
+        removeBlockFromAllStructures(event.getBlock().getLocation());
+        EventLogger.addLoggable(new GPTActionLoggable(getStructureThatContains(event.getBlock().getLocation()) + " is on fire!"));
+    }
+
+    @EventHandler
     public void onBlockExploded(BlockExplodeEvent event){
+        for(Block block : event.blockList()){
+            Location location = block.getLocation();
+            removeBlockFromAllStructures(location);
+        }
+    }
+
+    @EventHandler
+    public void onExploded(EntityExplodeEvent event){
         for(Block block : event.blockList()){
             Location location = block.getLocation();
             removeBlockFromAllStructures(location);
@@ -80,56 +99,88 @@ public class StructureManager implements Listener {
         structures = new HashMap<String,Structure>();
     }
 
+    private static String getStructureThatContains(Location block){
+        for(String key: structures.keySet()){
+            Structure structure = structures.get(key);
+            if(structure.containsBlock(block)){
+                return key;
+            }
+        }
+        return null;
+    }
+
     private static void removeBlockFromAllStructures(Location block){
         for(String key: structures.keySet()){
             Structure structure = structures.get(key);
             if(structure.containsBlock(block)){
                 structure.removeBlock(block);
-                if(structures.size() < 1) structures.remove(key);
+                if(structure.getSize() < 1) structures.remove(key);
             }
         }
     }
 
-    public static String getClosestStructureToPlayer(Player player){
+    public static String getClosestStructureToLocation(Location location){
         if(getStructures().isEmpty()) return "";
         int distance = Integer.MAX_VALUE;
         String closest = "";
-        Location playerLocation = player.getLocation();
         for(String key : getStructures()){
-            int temp = Math.toIntExact(Math.round(playerLocation.distance(structures.get(key).getLocation())));
+            int temp = Math.toIntExact(Math.round(location.distance(structures.get(key).getLocation())));
             if(temp< distance){
                 distance = temp;
                 closest = key;
             }
         }
         if(distance < 10){
-            return String.format("Location: near %s", closest);
+            return String.format("Location: near %s\n", closest);
         }
         else if(distance < 50){
-            return String.format("Location: %d blocks away from %s", closest);
+            return String.format("Location: %d blocks away from %s\n", closest);
         }
         else{
             return "";
         }
     }
 
-    public static Map<String, Integer> getStructureProximityData(Player player){
+    public static StructureProximityData getStructureProximityData(Location location){
         if(getStructures().isEmpty()) return null;
         int distance = Integer.MAX_VALUE;
         String closest = "";
-        Location playerLocation = player.getLocation();
         for(String key : getStructures()){
-            int temp = Math.toIntExact(Math.round(playerLocation.distance(structures.get(key).getLocation())));
+            int temp = Math.toIntExact(Math.round(location.distance(structures.get(key).getLocation())));
             if(temp< distance){
                 distance = temp;
                 closest = key;
             }
         }
         if(distance < 50){
-            return Map.of(closest, distance);
+            return new StructureProximityData(closest, distance);
         }
         else{
             return null;
         }
     }
+
+    public static boolean hasStructure(String key){
+        return structures.containsKey(key);
+    }
+
+    public static class StructureProximityData{
+        private int distance;
+        private String structure;
+    
+        public StructureProximityData(String structure, int distance){
+            this.distance = distance;
+            this.structure = structure;
+        }
+    
+        public int getDistance() {
+            return distance;
+        }
+    
+        public String getStructure() {
+            return structure;
+        }
+    }
 }
+
+
