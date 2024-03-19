@@ -50,6 +50,7 @@ public class GameLoop {
         public void run() {
             EventLogger.cull(GPT_API.getMaxTokens() - staticTokens);
             GPT_API.addLogs(EventLogger.dump(), "logs");
+            if(EventLogger.hasSummary()) GPT_API.addLogs(EventLogger.getSummary(), "summary");
             GPT_API.send();
         }
         

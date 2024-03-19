@@ -5,12 +5,14 @@ import java.util.TreeSet;
 
 import net.bigyous.gptgodmc.utils.CompareLoggables;
 import net.bigyous.gptgodmc.utils.GPTUtils;
+import net.bigyous.gptgodmc.GPT.SummarizeLogs;
 import net.bigyous.gptgodmc.loggables.Loggable;
 
 public class EventLogger {
     // private static List<Loggable> loggables = new ArrayList<>();
     private static TreeSet<Loggable> loggables = new TreeSet<>(new CompareLoggables());
     private static int totalTokens = 0;
+    private static String summary = null;
     public static void addLoggable(Loggable event) {
         if (loggables.size() > 0) {
             Loggable last = loggables.last();
@@ -60,13 +62,21 @@ public class EventLogger {
         }
 
         // Clear events
-        // TODO: Summarize instead
+        
         loggables.clear();
 
         return logs;
     }
 
     public static String dump() {
-        return String.join("\n", flushLogs());
+        String out = String.join("\n", flushLogs());
+        summary = SummarizeLogs.summarize(out, summary);
+        return out;
+    }
+    public static boolean hasSummary(){
+        return summary != null;
+    }
+    public static String getSummary(){
+        return summary;
     }
 }

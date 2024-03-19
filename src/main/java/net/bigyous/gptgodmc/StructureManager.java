@@ -84,7 +84,7 @@ public class StructureManager implements Listener {
 
     private String nameStructure(Location block){
         // Look we are just going to assume the first block placed will make up the majority of blocks in the structure
-        return String.format("%s Structure %d", block.getBlock().getType().name(),structures.size() );
+        return String.format("%s_Structure_%d", block.getBlock().getType().name(),structures.size() );
     }
 
     public static List<String> getStructures() {
@@ -134,7 +134,7 @@ public class StructureManager implements Listener {
             return String.format("Location: near %s\n", closest);
         }
         else if(distance < 50){
-            return String.format("Location: %d blocks away from %s\n", closest);
+            return String.format("Location: %d blocks away from %s\n", distance, closest);
         }
         else{
             return "";
