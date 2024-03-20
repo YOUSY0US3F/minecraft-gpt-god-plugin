@@ -29,7 +29,6 @@ import net.bigyous.gptgodmc.utils.DebugCommand;
 
 public class GptAPI {
     private GsonBuilder gson = new GsonBuilder();
-    private CloseableHttpClient client;
     private GptRequest body;
     private String CHATGPTURL = "https://api.openai.com/v1/chat/completions";
     private Map<String, Integer> messageMap = new HashMap<String, Integer>();
@@ -37,13 +36,11 @@ public class GptAPI {
         this.body = new GptRequest(model, GptActions.GetAllTools());
         gson.registerTypeAdapter(GptModel.class, new ModelSerializer());
         gson.setExclusionStrategies(new ParameterExclusion());
-        this.client = HttpClientBuilder.create().build();
     }
     public GptAPI (GptModel model, GptTool[] customTools){
         this.body = new GptRequest(model, customTools);
         gson.registerTypeAdapter(GptModel.class, new ModelSerializer());
         gson.setExclusionStrategies(new ParameterExclusion());
-        this.client = HttpClientBuilder.create().build();
     }
     public GptAPI(GptRequest request){
         this.body = request;
@@ -83,6 +80,7 @@ public class GptAPI {
         return body.getModel().getName();
     }
     public void send(){
+        CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(()->{
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
@@ -110,6 +108,7 @@ public class GptAPI {
         worker.start();
     }
     public void send(Map<String,GptFunction> functions){
+        CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(()->{
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
