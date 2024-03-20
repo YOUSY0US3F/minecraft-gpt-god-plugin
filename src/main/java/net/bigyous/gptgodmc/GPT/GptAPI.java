@@ -46,7 +46,6 @@ public class GptAPI {
         this.body = request;
         gson.registerTypeAdapter(GptModel.class, new ModelSerializer());
         gson.setExclusionStrategies(new ParameterExclusion());
-        this.client = HttpClientBuilder.create().build();
     }
     public GptAPI addContext(String context, String name){
         if(this.messageMap.containsKey(name)){
