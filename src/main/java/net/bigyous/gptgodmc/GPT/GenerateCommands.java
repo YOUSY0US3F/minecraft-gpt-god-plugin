@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
-import net.bigyous.gptgodmc.GPT.Json.GptModel;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.Parameter;
 import net.bigyous.gptgodmc.interfaces.Function;

@@ -70,7 +70,7 @@ public class EventLogger {
 
     public static String dump() {
         String out = String.join("\n", flushLogs());
-        summary = SummarizeLogs.summarize(out, summary);
+        SummarizeLogs.summarize(out, summary);
         return out;
     }
     public static boolean hasSummary(){
@@ -78,5 +78,10 @@ public class EventLogger {
     }
     public static String getSummary(){
         return summary;
+    }
+
+    public static void setSummary(String newSummary){
+        GPTGOD.LOGGER.info("new summary set!");
+        summary = newSummary;
     }
 }
