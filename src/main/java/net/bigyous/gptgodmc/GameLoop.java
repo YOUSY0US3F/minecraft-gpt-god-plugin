@@ -53,8 +53,12 @@ public class GameLoop {
                 while(EventLogger.isGeneratingSummary() && !EventLogger.hasSummary()){
                     Thread.onSpinWait();
                 }
-                if(EventLogger.hasSummary()) GPT_API.addLogs(EventLogger.getSummary(), "summary");
-                EventLogger.cull(GPT_API.getMaxTokens() - staticTokens);
+                int nonLogTokens = staticTokens;
+                if(EventLogger.hasSummary()) {
+                    GPT_API.addLogs(EventLogger.getSummary(), "summary");
+                    nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary());
+                }
+                EventLogger.cull(GPT_API.getMaxTokens() - nonLogTokens);
                 GPT_API.send();
                 Thread.currentThread().interrupt();
             });
