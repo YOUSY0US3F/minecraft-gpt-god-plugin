@@ -48,10 +48,18 @@ public class GameLoop {
 
         @Override
         public void run() {
-            EventLogger.cull(GPT_API.getMaxTokens() - staticTokens);
             GPT_API.addLogs(EventLogger.dump(), "logs");
-            if(EventLogger.hasSummary()) GPT_API.addLogs(EventLogger.getSummary(), "summary");
-            GPT_API.send();
+            Thread worker = new Thread(()->{
+                while(EventLogger.isGeneratingSummary() && !EventLogger.hasSummary()){
+                    Thread.onSpinWait();
+                }
+                if(EventLogger.hasSummary()) GPT_API.addLogs(EventLogger.getSummary(), "summary");
+                EventLogger.cull(GPT_API.getMaxTokens() - staticTokens);
+                GPT_API.send();
+                Thread.currentThread().interrupt();
+            });
+            worker.start();
+
         }
         
     }

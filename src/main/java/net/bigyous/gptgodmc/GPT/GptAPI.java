@@ -3,15 +3,10 @@ package net.bigyous.gptgodmc.GPT;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -27,14 +22,12 @@ import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptModel;
 import net.bigyous.gptgodmc.GPT.Json.GptRequest;
-import net.bigyous.gptgodmc.GPT.Json.GptResponse;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.ModelSerializer;
 import net.bigyous.gptgodmc.GPT.Json.ParameterExclusion;
 
 public class GptAPI {
     private GsonBuilder gson = new GsonBuilder();
-    private Gson gsonInstance = new Gson();
     private CloseableHttpClient client;
     private GptRequest body;
     private String CHATGPTURL = "https://api.openai.com/v1/chat/completions";
@@ -141,44 +134,6 @@ public class GptAPI {
             Thread.currentThread().interrupt();
         });
         worker.start();
-    }
-
-    public CompletableFuture<GptResponse> sendAsync(){
-        CloseableHttpAsyncClient asyncClient = HttpAsyncClientBuilder.create().build();
-        FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
-        StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
-        GPTGOD.LOGGER.info("POSTING " + gson.setPrettyPrinting().create().toJson(body));
-        HttpPost post = new HttpPost(CHATGPTURL);
-        post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + config.getString("openAiKey"));
-        GPTGOD.LOGGER.info("Making POST request");
-        post.setEntity(data);
-        CompletableFuture<GptResponse> future = new CompletableFuture<>();
-        asyncClient.start();
-        asyncClient.execute(post, new FutureCallback<HttpResponse>() {
-            @Override
-            public void completed(HttpResponse result) {
-                try {
-                    String responseBody = EntityUtils.toString(result.getEntity());
-                    GPTGOD.LOGGER.info("Async Response: %s", responseBody);
-                    future.complete(gsonInstance.fromJson(responseBody, GptResponse.class));
-                } catch (ParseException e) {
-                    future.completeExceptionally(e);
-                } catch (IOException e) {
-                    future.completeExceptionally(e);
-                }
-                
-            }
-
-            @Override
-            public void failed(Exception ex) {
-                future.completeExceptionally(ex);
-            }
-
-            @Override
-            public void cancelled() {
-            }
-        });
-        return future;
     }
 
     //DEBUG method

@@ -7,6 +7,7 @@ import com.google.gson.reflect.TypeToken;
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
+import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
 import net.bigyous.gptgodmc.GPT.Json.GptResponse;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.Parameter;
@@ -21,11 +22,12 @@ public class SummarizeLogs {
     private static Function<String> submitSummary = (String args) ->{
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>(){};
         Map<String, String> argsMap = gson.fromJson(args, mapType);
+        GPTGOD.LOGGER.info("summary submitted with args: ", args);
         EventLogger.setSummary(argsMap.get("summary"));
     };
     private static Map<String, GptFunction> functionMap = Map.of("submitSummary", 
         new GptFunction("submitSummary", "input the summary, keep the summary below 1000 tokens", 
-            Map.of("commands", new Parameter("string","the summary")), 
+            Map.of("summary", new Parameter("string","the summary")), 
             submitSummary));
     private static GptTool[] tools = GptActions.wrapFunctions(functionMap);
     private static GptAPI gpt = new GptAPI(GPTModels.GPT_3, tools)
@@ -35,7 +37,7 @@ public class SummarizeLogs {
     the logs start with a summary of Server Information that details the state of all the players and some basic info about the server.
     You will create a short summary based on this information that preserves the plot. \
     If information in the logs isn't important to the plot omit it.
-    """, "prompt").setToolChoice("submitSummary");
+    """, "prompt").setToolChoice(new GptFunctionReference(functionMap.get("submitSummary")));
 
     public static void summarize(String log, String summary){
         String content = String.format("Write a short summary that summarizes the events of these logs: %s%s", log, 
