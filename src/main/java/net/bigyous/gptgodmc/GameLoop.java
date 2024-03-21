@@ -56,7 +56,7 @@ public class GameLoop {
                 int nonLogTokens = staticTokens;
                 if(EventLogger.hasSummary()) {
                     GPT_API.addLogs(EventLogger.getSummary(), "summary");
-                    nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary());
+                    nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary()) + 1;
                 }
                 EventLogger.cull(GPT_API.getMaxTokens() - nonLogTokens);
                 GPT_API.send();
