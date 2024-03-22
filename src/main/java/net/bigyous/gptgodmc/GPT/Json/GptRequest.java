@@ -28,6 +28,10 @@ public class GptRequest {
         messages.add(new GptMessage(role, content));
     }
 
+    public void addMessage(String role, String content, int index){
+        messages.add(index, new GptMessage(role, content));
+    }
+
     public void clearMessages(){
         this.messages = new ArrayList<GptMessage>();
     }

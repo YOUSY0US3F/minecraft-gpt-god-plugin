@@ -68,6 +68,15 @@ public class GptAPI {
         this.messageMap.put(name, this.body.getMessagesSize()-1);
         return this;
     }
+    public GptAPI addLogs(String Logs, String name, int index){
+        if(this.messageMap.containsKey(name)){
+            this.body.replaceMessage(messageMap.get(name), Logs);
+            return this;
+        }
+        this.body.addMessage("user", Logs, index);
+        this.messageMap.put(name, this.body.getMessagesSize()-1);
+        return this;
+    }
     public GptAPI setToolChoice(Object tool_choice){
         this.body.setTool_choice(tool_choice);
         return this;
