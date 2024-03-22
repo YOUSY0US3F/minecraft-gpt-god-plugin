@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -16,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.bigyous.gptgodmc.GPTGOD;
@@ -25,7 +25,6 @@ import net.bigyous.gptgodmc.GPT.Json.GptRequest;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.ModelSerializer;
 import net.bigyous.gptgodmc.GPT.Json.ParameterExclusion;
-import net.bigyous.gptgodmc.utils.DebugCommand;
 
 public class GptAPI {
     private GsonBuilder gson = new GsonBuilder();
@@ -62,6 +61,15 @@ public class GptAPI {
             return this;
         }
         this.body.addMessage("user", Logs);
+        this.messageMap.put(name, this.body.getMessagesSize()-1);
+        return this;
+    }
+    public GptAPI addLogs(String Logs, String name, int index){
+        if(this.messageMap.containsKey(name)){
+            this.body.replaceMessage(messageMap.get(name), Logs);
+            return this;
+        }
+        this.body.addMessage("user", Logs, index);
         this.messageMap.put(name, this.body.getMessagesSize()-1);
         return this;
     }

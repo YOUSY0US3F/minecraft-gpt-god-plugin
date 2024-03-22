@@ -21,6 +21,7 @@ dependencies {
     implementation 'com.github.mizosoft.methanol:methanol:1.7.0'
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
     implementation 'org.apache.httpcomponents:httpclient:4.5.14'
+    implementation 'org.apache.httpcomponents:httpasyncclient:4.1.5'
     implementation 'commons-io:commons-io:2.15.1'
     // To use this dependency, you need to compile bukkit by yourself
     // See https://www.spigotmc.org/wiki/buildtools/
@@ -53,5 +54,6 @@ shadowJar {
         include(dependency('com.google.code.gson:.*'))
         include(dependency('com.github.mizosoft.methanol:.*'))
         include(dependency('com.knuddels:.*'))
+        include(dependency('org.apache.httpcomponents:.*'))
     }
 }

@@ -48,9 +48,22 @@ public class GameLoop {
 
         @Override
         public void run() {
-            EventLogger.cull(GPT_API.getMaxTokens() - staticTokens);
             GPT_API.addLogs(EventLogger.dump(), "logs");
-            GPT_API.send();
+            Thread worker = new Thread(()->{
+                while(EventLogger.isGeneratingSummary() && !EventLogger.hasSummary()){
+                    Thread.onSpinWait();
+                }
+                int nonLogTokens = staticTokens;
+                if(EventLogger.hasSummary()) {
+                    GPT_API.addLogs(EventLogger.getSummary(), "summary", 1);
+                    nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary()) + 1;
+                }
+                EventLogger.cull(GPT_API.getMaxTokens() - nonLogTokens);
+                GPT_API.send();
+                Thread.currentThread().interrupt();
+            });
+            worker.start();
+
         }
         
     }

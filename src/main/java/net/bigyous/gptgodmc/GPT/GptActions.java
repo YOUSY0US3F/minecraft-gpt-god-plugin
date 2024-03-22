@@ -33,8 +33,7 @@ public class GptActions {
     private static Gson gson = new Gson();
 
     private static Function<String> whisper = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
-        };
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>(){};
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         Player player = GPTGOD.SERVER.getPlayerExact(argsMap.get("playerName"));
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
