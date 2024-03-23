@@ -1,6 +1,9 @@
 package net.bigyous.gptgodmc.GPT;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -84,8 +87,13 @@ public class GptActions {
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
                     command)));
+    private static Map<String, GptFunction> speechFunctionMap = new HashMap<>(functionMap);
+    private static Map<String, GptFunction> actionFunctionMap = new HashMap<>(functionMap);
 
-    private static GptTool[] tools = new GptTool[functionMap.size()];
+    private static GptTool[] tools;
+    private static GptTool[] actionTools;
+    private static GptTool[] speechTools;
+    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper");
 
     public static GptTool[] wrapFunctions(Map<String, GptFunction> functions) {
         GptFunction[] funcList = functions.values().toArray(new GptFunction[functions.size()]);
@@ -104,17 +112,35 @@ public class GptActions {
         return tools;
     }
 
+    public static GptTool[] GetActionTools() {
+        if(actionTools[0] != null){
+            return actionTools;
+        }
+        actionFunctionMap.keySet().removeAll(speechActionKeys);
+        actionTools = wrapFunctions(actionFunctionMap);
+        return actionTools;
+    }
+
+    public static GptTool[] GetSpeechTools() {
+        if(speechTools[0] != null){
+            return speechTools;
+        }
+        speechFunctionMap.keySet().retainAll(speechActionKeys);
+        speechTools = wrapFunctions(speechFunctionMap);
+        return speechTools;
+    }
+
     public static void executeCommands(String[] commands) {
         CommandSender console = GPTGOD.SERVER.getConsoleSender();
         for (String command : commands) {
-            command = command.charAt(0) == '/' ? command.substring(1) : command;
+            command = command.replaceAll("\\/|(execute )", "");
             GPTGOD.SERVER.dispatchCommand(console, String.format("execute in %s %s", WorldManager.getDimensionName(), command));
         }
     }
 
     public static void executeCommand(String command) {
         CommandSender console = GPTGOD.SERVER.getConsoleSender();
-        command = command.charAt(0) == '/' ? command.substring(1) : command;
+        command = command.replaceAll("\\/|(execute )", "");
         GPTGOD.SERVER.dispatchCommand(console, String.format("execute in %s %s", WorldManager.getDimensionName(), command));
     }
 
