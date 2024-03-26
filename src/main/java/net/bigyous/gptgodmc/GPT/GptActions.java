@@ -131,7 +131,7 @@ public class GptActions {
     }
 
     private static void dispatch(String command, CommandSender console){
-        if(command.contains("give ")){
+        if(command.matches(".*\\bgive\\b.*")){
             GPTGOD.SERVER.dispatchCommand(console, command);
         }
         else{
