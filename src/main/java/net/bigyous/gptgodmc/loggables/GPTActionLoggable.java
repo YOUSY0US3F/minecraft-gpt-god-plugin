@@ -1,10 +1,13 @@
 package net.bigyous.gptgodmc.loggables;
 
+import net.bigyous.gptgodmc.GameLoop;
+
 public class GPTActionLoggable extends BaseLoggable {
     private String text;
 
     public GPTActionLoggable(String text){
-        this.text = text;
+        this.text = "You " + text;
+        GameLoop.logAction(text);
     }
 
     @Override

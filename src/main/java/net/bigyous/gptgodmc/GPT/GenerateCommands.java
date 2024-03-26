@@ -30,7 +30,7 @@ public class GenerateCommands {
     private static GptAPI gpt= new GptAPI(GPTModels.GPT_3, tools)
         .addContext("""
             You are a helpful assistant that will generate \
-            minecraft commands based on a prompt inputted by the user, \
+            minecraft java edition commands based on a prompt inputted by the user, \
             even if the prompt seems impossible in minecraft try to approximate it as close as possible \
             with minecraft commands a wrong answer is better than no answer. \
             don't use execute in.""", "context")

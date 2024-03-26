@@ -49,25 +49,22 @@ public final class GPTGOD extends JavaPlugin {
         saveConfig();
         getCommand("try").setExecutor(new DebugCommand());
         Path worlds = getDataFolder().toPath().resolve("worlds");
-        if(getConfig().getString("startingWorld").isBlank()|| !getConfig().getBoolean("Rounds")){
-            String message = getConfig().getBoolean("Rounds")?
-            "can't use Round system since startingWorld is not set. Go to %s to fix this.":
-            "Round System disabled be warned, this is not the intended way to use gptgodmc. Go to %s to fix this";
+        if (getConfig().getString("startingWorld").isBlank() || !getConfig().getBoolean("Rounds")) {
+            String message = getConfig().getBoolean("Rounds")
+                    ? "can't use Round system since startingWorld is not set. Go to %s to fix this."
+                    : "Round System disabled be warned, this is not the intended way to use gptgodmc. Go to %s to fix this";
             LOGGER.warn(String.format(message, this.getDataFolder().getPath() + "\\config.yml"));
-        }
-        else{
-            if(WorldManager.loadMap(getConfig().getString("startingWorld"))){
+        } else {
+            if (WorldManager.loadMap(getConfig().getString("startingWorld"))) {
                 SERVER.getPluginManager().registerEvents(new RoundSystem(), this);
             }
-            
+
         }
         SERVER.getPluginManager().registerEvents(new LoggableEventHandler(), this);
         SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
         SERVER.getPluginManager().registerEvents(new StructureManager(), this);
 
     }
-
-
 
     @Override
     public void onDisable() {
@@ -78,25 +75,26 @@ public final class GPTGOD extends JavaPlugin {
         }
     }
 
-    private static class StartGameLoop implements Listener{
+    private static class StartGameLoop implements Listener {
         @EventHandler
-        public void onPlayerJoin(PlayerJoinEvent event){
+        public void onPlayerJoin(PlayerJoinEvent event) {
             GameLoop.init();
-            
+
         }
 
         @EventHandler
-        public void onPlayerDisconnect(PlayerQuitEvent event){ 
+        public void onPlayerDisconnect(PlayerQuitEvent event) {
             GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
         }
-        private static class StopGPT implements Runnable{
+
+        private static class StopGPT implements Runnable {
 
             @Override
             public void run() {
                 GPTGOD.LOGGER.info("All players Left, stopping gameLoop");
                 GameLoop.stop();
             }
-            
+
         }
     }
 }

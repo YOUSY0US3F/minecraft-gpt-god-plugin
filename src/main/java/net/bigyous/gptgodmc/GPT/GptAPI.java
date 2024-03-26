@@ -31,6 +31,7 @@ public class GptAPI {
     private GptRequest body;
     private String CHATGPTURL = "https://api.openai.com/v1/chat/completions";
     private Map<String, Integer> messageMap = new HashMap<String, Integer>();
+    private boolean isSending = false;
     public GptAPI (GptModel model){
         this.body = new GptRequest(model, GptActions.GetAllTools());
         gson.registerTypeAdapter(GptModel.class, new ModelSerializer());
@@ -70,7 +71,12 @@ public class GptAPI {
             return this;
         }
         this.body.addMessage("user", Logs, index);
-        this.messageMap.put(name, this.body.getMessagesSize()-1);
+        for(String key : messageMap.keySet()){
+            if(messageMap.get(key) == index){
+                messageMap.replace(key, index + 1);
+            }
+        }
+        this.messageMap.put(name, index);
         return this;
     }
     public GptAPI setToolChoice(Object tool_choice){
@@ -89,6 +95,7 @@ public class GptAPI {
     public void send(){
         CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(()->{
+            this.isSending = true;
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
             GPTGOD.LOGGER.info("POSTING " + gson.setPrettyPrinting().create().toJson(body));
@@ -110,6 +117,7 @@ public class GptAPI {
             } catch (IOException e) {
                 GPTGOD.LOGGER.error("There was an error maing a request to GPT", e);
             }
+            this.isSending = false;
             Thread.currentThread().interrupt();
         });
         worker.start();
@@ -117,6 +125,7 @@ public class GptAPI {
     public void send(Map<String,GptFunction> functions){
         CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(()->{
+            this.isSending = true;
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data =new StringEntity(gson.create().toJson(body),ContentType.APPLICATION_JSON);
             GPTGOD.LOGGER.info("POSTING " + gson.setPrettyPrinting().create().toJson(body));
@@ -138,9 +147,14 @@ public class GptAPI {
             } catch (IOException e) {
                 GPTGOD.LOGGER.error("There was an error maing a request to GPT", e);
             }
+            this.isSending = false;
             Thread.currentThread().interrupt();
         });
         worker.start();
+    }
+
+    public boolean isSending(){
+        return isSending;
     }
 
     //DEBUG method

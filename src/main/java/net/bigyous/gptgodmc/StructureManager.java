@@ -2,7 +2,6 @@ package net.bigyous.gptgodmc;
 
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -16,7 +15,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
+import net.bigyous.gptgodmc.loggables.GenericEventLoggable;
 
 import org.bukkit.entity.Player;
 
@@ -43,7 +42,7 @@ public class StructureManager implements Listener {
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event){
         removeBlockFromAllStructures(event.getBlock().getLocation());
-        EventLogger.addLoggable(new GPTActionLoggable(getStructureThatContains(event.getBlock().getLocation()) + " is on fire!"));
+        EventLogger.addLoggable(new GenericEventLoggable(getStructureThatContains(event.getBlock().getLocation()) + " is on fire!"));
     }
 
     @EventHandler
