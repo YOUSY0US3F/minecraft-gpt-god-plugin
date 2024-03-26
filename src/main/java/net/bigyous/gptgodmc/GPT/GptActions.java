@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
+import net.bigyous.gptgodmc.StructureManager;
 import net.bigyous.gptgodmc.WorldManager;
 import net.bigyous.gptgodmc.GPT.Json.Choice;
 import net.bigyous.gptgodmc.GPT.Json.GptFunction;
@@ -58,7 +59,9 @@ public class GptActions {
         int count = gson.fromJson(argObject.get("count"), Integer.class);
         //executeCommand(String.format("/give %s %s %d", playerName, itemId, count));
         if(Material.matchMaterial(itemId) == null) return;
-        GPTGOD.SERVER.getPlayer(playerName).getInventory().addItem(new ItemStack(Material.matchMaterial(itemId), count));
+        Player player = GPTGOD.SERVER.getPlayer(playerName);
+        player.getInventory().addItem(new ItemStack(Material.matchMaterial(itemId), count));
+        player.sendRichMessage(String.format("<i>A %s appeared in your inventory</i>", itemId));
         EventLogger.addLoggable(new GPTActionLoggable(String.format("gave %d %s to %s", count, itemId, playerName ) ));
     };
     private static Function<String> command = (String args) -> {
@@ -67,6 +70,13 @@ public class GptActions {
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         GenerateCommands.generate(argsMap.get("prompt"));
         EventLogger.addLoggable(new GPTActionLoggable(String.format("commanded \"%s\" to happen", argsMap.get("prompt") ) ));
+    };
+    private static Function<String> detonateStructure = (String args) -> {
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
+        String structure = gson.fromJson(argObject.get("structure"), String.class);
+        boolean setFire = gson.fromJson(argObject.get("setFire"), Boolean.class);
+        int power = gson.fromJson(argObject.get("power"), Integer.class);
+        StructureManager.getStructure(structure).getLocation().createExplosion(power, setFire, true);
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("whisper", new GptFunction("whisper", "send a private message to a player",
@@ -86,7 +96,12 @@ public class GptActions {
             Map.entry("command", new GptFunction("command",
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
-                    command)));
+                    command)),
+            Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
+                Map.of("structure", new Parameter("string", "name of the structure"),
+                        "setFire", new Parameter("boolean", "will this explosion cause fires?"),
+                        "power", new Parameter("number", "the strength of this explosion where 4 is the strength of TNT")),
+                        detonateStructure)));
     private static Map<String, GptFunction> speechFunctionMap = new HashMap<>(functionMap);
     private static Map<String, GptFunction> actionFunctionMap = new HashMap<>(functionMap);
 
