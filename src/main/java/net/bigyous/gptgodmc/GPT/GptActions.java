@@ -6,7 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,39 +40,72 @@ public class GptActions {
     private static Gson gson = new Gson();
 
     private static Function<String> whisper = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>(){};
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         Player player = GPTGOD.SERVER.getPlayerExact(argsMap.get("playerName"));
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
         player.sendMessage(argsMap.get("message"));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("whispered \"%s\" to %s",argsMap.get("message"), argsMap.get("playerName"))));
+        EventLogger.addLoggable(new GPTActionLoggable(
+                String.format("whispered \"%s\" to %s", argsMap.get("message"), argsMap.get("playerName"))));
     };
     private static Function<String> announce = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW).decoration(TextDecoration.BOLD, true));
-        GPTGOD.SERVER.broadcast(Component.text(argsMap.get("message"), NamedTextColor.LIGHT_PURPLE).decoration(TextDecoration.BOLD, true));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"",argsMap.get("message") )));
+        GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW)
+                .decoration(TextDecoration.BOLD, true));
+        GPTGOD.SERVER.broadcast(Component.text(argsMap.get("message"), NamedTextColor.LIGHT_PURPLE)
+                .decoration(TextDecoration.BOLD, true));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", argsMap.get("message"))));
     };
     private static Function<String> giveItem = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
         String itemId = gson.fromJson(argObject.get("itemId"), String.class);
         int count = gson.fromJson(argObject.get("count"), Integer.class);
-        //executeCommand(String.format("/give %s %s %d", playerName, itemId, count));
-        if(Material.matchMaterial(itemId) == null) return;
+        // executeCommand(String.format("/give %s %s %d", playerName, itemId, count));
+        if (Material.matchMaterial(itemId) == null)
+            return;
         Player player = GPTGOD.SERVER.getPlayer(playerName);
         player.getInventory().addItem(new ItemStack(Material.matchMaterial(itemId), count));
         player.sendRichMessage(String.format("<i>A %s appeared in your inventory</i>", itemId));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("gave %d %s to %s", count, itemId, playerName ) ));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("gave %d %s to %s", count, itemId, playerName)));
     };
     private static Function<String> command = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         GenerateCommands.generate(argsMap.get("prompt"));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("commanded \"%s\" to happen", argsMap.get("prompt") ) ));
+        EventLogger
+                .addLoggable(new GPTActionLoggable(String.format("commanded \"%s\" to happen", argsMap.get("prompt"))));
+    };
+    private static Function<String> smite = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String playerName = argsMap.get("playerName");
+        Player player = GPTGOD.SERVER.getPlayer(playerName);
+        WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("smited %s", playerName)));
+    };
+    // this one's fucked
+    private static Function<String> summonSupplyChest = (String args) -> {
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
+        String playerName = gson.fromJson(argObject.get("playerName"), String.class);
+        @SuppressWarnings("unchecked")
+        Map<String, Integer> itemNames = gson.fromJson(argObject.get("items"), Map.class);
+        List<ItemStack> items = itemNames.keySet().stream().map((String itemName) -> {
+            return new ItemStack(Material.matchMaterial(itemName), itemNames.get(itemName));
+        }).toList();
+        Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
+        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.blockX() + 1, playerLoc.blockY(), playerLoc.blockZ() + 1);
+        currentBlock.setType(Material.CHEST);
+        Chest chest = (Chest) currentBlock;
+        chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
+    };
+    private static Function<String> transformStructure = (String args) -> {
+
     };
     private static Function<String> detonateStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -77,6 +113,7 @@ public class GptActions {
         boolean setFire = gson.fromJson(argObject.get("setFire"), Boolean.class);
         int power = gson.fromJson(argObject.get("power"), Integer.class);
         StructureManager.getStructure(structure).getLocation().createExplosion(power, setFire, true);
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("detonated Structure: %s", structure)));
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("whisper", new GptFunction("whisper", "send a private message to a player",
@@ -97,11 +134,13 @@ public class GptActions {
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
                     command)),
+            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",  Collections.singletonMap("playerName", new Parameter("string", "the player's name")) , smite)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
-                Map.of("structure", new Parameter("string", "name of the structure"),
-                        "setFire", new Parameter("boolean", "will this explosion cause fires?"),
-                        "power", new Parameter("number", "the strength of this explosion where 4 is the strength of TNT")),
-                        detonateStructure)));
+                    Map.of("structure", new Parameter("string", "name of the structure"),
+                            "setFire", new Parameter("boolean", "will this explosion cause fires?"),
+                            "power",
+                            new Parameter("number", "the strength of this explosion where 4 is the strength of TNT")),
+                    detonateStructure)));
     private static Map<String, GptFunction> speechFunctionMap = new HashMap<>(functionMap);
     private static Map<String, GptFunction> actionFunctionMap = new HashMap<>(functionMap);
 
@@ -128,7 +167,7 @@ public class GptActions {
     }
 
     public static GptTool[] GetActionTools() {
-        if(actionTools != null && actionTools[0] != null){
+        if (actionTools != null && actionTools[0] != null) {
             return actionTools;
         }
         actionFunctionMap.keySet().removeAll(speechActionKeys);
@@ -137,7 +176,7 @@ public class GptActions {
     }
 
     public static GptTool[] GetSpeechTools() {
-        if(speechTools != null &&speechTools[0] != null){
+        if (speechTools != null && speechTools[0] != null) {
             return speechTools;
         }
         speechFunctionMap.keySet().retainAll(speechActionKeys);
@@ -145,13 +184,13 @@ public class GptActions {
         return speechTools;
     }
 
-    private static void dispatch(String command, CommandSender console){
-        if(command.matches(".*\\bgive\\b.*")){
+    private static void dispatch(String command, CommandSender console) {
+        if (command.matches(".*\\bgive\\b.*")) {
             GPTGOD.SERVER.dispatchCommand(console, command);
-        }
-        else{
+        } else {
             command = command.replaceAll("\\/|(execute )", "");
-            GPTGOD.SERVER.dispatchCommand(console, String.format("execute in %s %s", WorldManager.getDimensionName(), command));
+            GPTGOD.SERVER.dispatchCommand(console,
+                    String.format("execute in %s %s", WorldManager.getDimensionName(), command));
         }
     }
 
@@ -182,7 +221,7 @@ public class GptActions {
         }
     }
 
-    public static void processResponse(String response, Map<String, GptFunction> functions) {    
+    public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
@@ -191,16 +230,16 @@ public class GptActions {
         }
     }
 
-    private int calculateFunctionTokens(){
+    private int calculateFunctionTokens() {
         int sum = 0;
-        for(GptFunction function  : functionMap.values()){
-            sum+= function.calculateFunctionTokens();
+        for (GptFunction function : functionMap.values()) {
+            sum += function.calculateFunctionTokens();
         }
         return sum;
     }
 
-    public int getTokens(){
-        if(tokens >= 0){
+    public int getTokens() {
+        if (tokens >= 0) {
             return tokens;
         }
         return calculateFunctionTokens();
