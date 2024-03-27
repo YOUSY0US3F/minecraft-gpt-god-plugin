@@ -99,13 +99,21 @@ public class GptActions {
             return new ItemStack(Material.matchMaterial(itemName), itemNames.get(itemName));
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
-        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.blockX() + 1, playerLoc.blockY(), playerLoc.blockZ() + 1);
+        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.blockX() + 1, playerLoc.blockY(),
+                playerLoc.blockZ() + 1);
         currentBlock.setType(Material.CHEST);
         Chest chest = (Chest) currentBlock;
         chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
     };
     private static Function<String> transformStructure = (String args) -> {
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
+        String structure = gson.fromJson(argObject.get("structure"), String.class);
+        String blockType = gson.fromJson(argObject.get("block"), String.class);
 
+        StructureManager.getStructure(structure).getBlocks()
+                .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
+        EventLogger.addLoggable(
+                new GPTActionLoggable(String.format("turned all the blocks in Structure %s to %s", structure)));
     };
     private static Function<String> detonateStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -129,12 +137,17 @@ public class GptActions {
                             "itemId", new Parameter("string", "the name of the minecraft item"),
                             "count", new Parameter("number", "amount of the item")),
                     giveItem)),
-
             Map.entry("command", new GptFunction("command",
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
                     command)),
-            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",  Collections.singletonMap("playerName", new Parameter("string", "the player's name")) , smite)),
+            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",
+                    Collections.singletonMap("playerName", new Parameter("string", "the player's name")), smite)),
+            Map.entry("transformStructure",
+                    new GptFunction("transformStructure", "replace all the blocks in a structure with any block",
+                            Map.of("structure", new Parameter("string", "name of the structure"),
+                                    "block", new Parameter("string", "The name of the minecraft block")),
+                            transformStructure)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
                     Map.of("structure", new Parameter("string", "name of the structure"),
                             "setFire", new Parameter("boolean", "will this explosion cause fires?"),
