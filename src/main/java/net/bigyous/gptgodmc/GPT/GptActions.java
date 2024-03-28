@@ -1,5 +1,6 @@
 package net.bigyous.gptgodmc.GPT;
 
+import java.sql.Struct;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,9 +9,11 @@ import java.util.Map;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -89,14 +92,26 @@ public class GptActions {
         WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
         EventLogger.addLoggable(new GPTActionLoggable(String.format("smited %s", playerName)));
     };
+    private static Function<String> spawnEntity = (String args) -> {
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
+        String position = gson.fromJson(argObject.get("position"), String.class);
+        String entityName = gson.fromJson(argObject.get("entity"), String.class);
+        int count = gson.fromJson(argObject.get("count"), Integer.class);
+
+        Location location = StructureManager.hasStructure(position) ? StructureManager.getStructure(position).getLocation() : GPTGOD.SERVER.getPlayer(position).getLocation();
+        for(int i = 1; i < count; i++){
+            WorldManager.getCurrentWorld().spawnEntity(location, EntityType.fromName(entityName), true);
+        }
+    };
     // this one's fucked
     private static Function<String> summonSupplyChest = (String args) -> {
+        TypeToken<List<String>> stringArrayType = new TypeToken<List<String>>(){};
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
-        @SuppressWarnings("unchecked")
-        Map<String, Integer> itemNames = gson.fromJson(argObject.get("items"), Map.class);
-        List<ItemStack> items = itemNames.keySet().stream().map((String itemName) -> {
-            return new ItemStack(Material.matchMaterial(itemName), itemNames.get(itemName));
+        List<String> itemNames = gson.fromJson(argObject.get("items"), stringArrayType);
+        boolean fullStacks = gson.fromJson(argObject.get("fullStacks"), Boolean.class);
+        List<ItemStack> items = itemNames.stream().map((String itemName) -> {
+            return new ItemStack(Material.matchMaterial(itemName), fullStacks ? 64 : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
         Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.blockX() + 1, playerLoc.blockY(),
@@ -104,6 +119,7 @@ public class GptActions {
         currentBlock.setType(Material.CHEST);
         Chest chest = (Chest) currentBlock;
         chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
+        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation(), 50);
     };
     private static Function<String> transformStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -148,6 +164,11 @@ public class GptActions {
                             Map.of("structure", new Parameter("string", "name of the structure"),
                                     "block", new Parameter("string", "The name of the minecraft block")),
                             transformStructure)),
+            Map.entry("spawnEntity", new GptFunction("spawnEntity", "spawn any minecraft entity next to a player or structure",
+                Map.of("position", new Parameter("String", "name of the Player or Structure"),
+                    "entity", new Parameter("String", "the name of the minecraft entity name will be underscore deliminated eg. \"mushroom_cow\""),
+                        "count", new Parameter("number", "the amount of the entity that will be spawned"))
+            , spawnEntity)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
                     Map.of("structure", new Parameter("string", "name of the structure"),
                             "setFire", new Parameter("boolean", "will this explosion cause fires?"),
@@ -156,7 +177,7 @@ public class GptActions {
                     detonateStructure)));
     private static Map<String, GptFunction> speechFunctionMap = new HashMap<>(functionMap);
     private static Map<String, GptFunction> actionFunctionMap = new HashMap<>(functionMap);
-
+    
     private static GptTool[] tools;
     private static GptTool[] actionTools;
     private static GptTool[] speechTools;
