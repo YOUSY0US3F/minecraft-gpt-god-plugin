@@ -13,6 +13,7 @@ import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.Listener;
@@ -32,6 +33,7 @@ import net.bigyous.gptgodmc.loggables.EatingLoggable;
 import net.bigyous.gptgodmc.loggables.ExplosionLoggable;
 import net.bigyous.gptgodmc.loggables.ChatLoggable;
 import net.bigyous.gptgodmc.loggables.CombustLoggable;
+import net.bigyous.gptgodmc.loggables.CraftLoggable;
 import io.papermc.paper.event.player.AsyncChatEvent;
 
 import org.bukkit.event.EventHandler;
@@ -142,5 +144,10 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onMount(EntityMountEvent event){
         EventLogger.addLoggable(new MountLoggable(event));
+    }
+
+    @EventHandler
+    public static void onCraft(CraftItemEvent event){
+        EventLogger.addLoggable(new CraftLoggable(event));
     }
 }
