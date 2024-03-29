@@ -101,4 +101,10 @@ public class EventLogger {
     public static boolean isGeneratingSummary() {
         return generatingSummary;
     }
+
+    public static void reset(){
+        loggables.clear();
+        summary = null;
+        overflow = "";
+    }
 }

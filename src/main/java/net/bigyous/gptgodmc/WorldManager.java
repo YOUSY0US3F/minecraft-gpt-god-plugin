@@ -51,6 +51,7 @@ public class WorldManager {
             currentGameMap.getWorld().setGameRule(GameRule.DO_MOB_SPAWNING, true);
             currentGameMap.getWorld().setGameRule(GameRule.DO_WEATHER_CYCLE, true);
             currentGameMap.getWorld().setGameRule(GameRule.DO_DAYLIGHT_CYCLE, true);
+            currentGameMap.getWorld().setGameRule(GameRule.DISABLE_RAIDS, true);
             return true;
         }
         else{

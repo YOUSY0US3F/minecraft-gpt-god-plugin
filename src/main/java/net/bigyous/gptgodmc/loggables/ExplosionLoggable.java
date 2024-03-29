@@ -20,7 +20,7 @@ public class ExplosionLoggable extends BaseLoggable{
         
         StructureProximityData data  = StructureManager.getStructureProximityData(event.getBlock().getLocation());
 
-        this.nearbyStructure = data.getDistance() <= 5 ? data.getStructure() : "";
+        this.nearbyStructure = data != null && data.getDistance() <= 5 ? data.getStructure() : "";
 
         GPTGOD.LOGGER.info(nearbyPlayers, nearbyStructure);
     }

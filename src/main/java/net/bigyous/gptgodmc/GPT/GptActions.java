@@ -99,21 +99,20 @@ public class GptActions {
         String position = gson.fromJson(argObject.get("position"), String.class);
         String entityName = gson.fromJson(argObject.get("entity"), String.class);
         int count = gson.fromJson(argObject.get("count"), Integer.class);
-
         Location location = StructureManager.hasStructure(position)
                 ? StructureManager.getStructure(position).getLocation()
                 : GPTGOD.SERVER.getPlayer(position).getLocation();
-        for (int i = 1; i < count; i++) {
+        EntityType type = EntityType.fromName(entityName);
+        for (int i = 0; i < count; i++) {
             double r = Math.random() / Math.nextDown(1.0);
-            double offset = 0 * (1.0 - 1) + 3 * r;
+            double offset = 0 * (1.0 - 1) + 3 * r;     
             WorldManager.getCurrentWorld().spawnEntity(
                     location.offset(offset - i, 0, offset + i).toLocation(WorldManager.getCurrentWorld()),
-                    EntityType.fromName(entityName), true);
+                    type, true);
         }
         EventLogger.addLoggable(
-                new GPTActionLoggable(String.format("summond %d %s near %s", count, entityName, position)));
+                new GPTActionLoggable(String.format("summoned %d %s near %s", count, entityName, position)));
     };
-    // this one's fucked
     private static Function<String> summonSupplyChest = (String args) -> {
         TypeToken<List<String>> stringArrayType = new TypeToken<List<String>>() {
         };
@@ -126,12 +125,12 @@ public class GptActions {
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
-        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.blockX() + 1, playerLoc.blockY(),
-                playerLoc.blockZ() + 1);
+        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.offset(playerLoc.getDirection().getBlockX() + 1, 0, playerLoc.getDirection().getBlockZ() + 1).toLocation(null));
         currentBlock.setType(Material.CHEST);
-        Chest chest = (Chest) currentBlock;
+        Chest chest = (Chest) currentBlock.getState();
         chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
-        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation(), 50);
+        chest.open();
+        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100, 2, 3, 2);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
                 String.join(", ", itemNames), playerName)));
     };
@@ -143,7 +142,7 @@ public class GptActions {
         StructureManager.getStructure(structure).getBlocks()
                 .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
         EventLogger.addLoggable(
-                new GPTActionLoggable(String.format("turned all the blocks in Structure %s to %s", structure)));
+                new GPTActionLoggable(String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
     };
     private static Function<String> revive = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -202,7 +201,7 @@ public class GptActions {
             Map.entry("summonSupplyChest", new GptFunction("summonSupplyChest",
                     "spawn chest full of items next to a player",
                     Map.of("items",
-                            new Parameter("array", "names of the minecraft items you would like to put in the chest",
+                            new Parameter("array", "names of the minecraft items you would like to put in the chest, each item takes up one of 8 slots",
                                     "string"),
                             "fullStacks", new Parameter("boolean", "put the maximum stack size of each item?"),
                             "playerName",
