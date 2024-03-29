@@ -36,6 +36,8 @@ public class RoundSystem implements Listener {
     public static void reset(){
         GameLoop.stop();
         WorldManager.resetCurrentMap();
+        StructureManager.reset();
+        EventLogger.reset();
         for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
             revivePlayer(p);
         }

@@ -50,6 +50,7 @@ public class GameLoop {
     public static void stop(){
         if(!isRunning) return;
         GPTGOD.SERVER.getScheduler().cancelTask(taskId);
+        EventLogger.reset();
         Action_GPT_API = new GptAPI(GPTModels.getMainModel());
         Speech_GPT_API = new GptAPI(GPTModels.getMainModel());
         isRunning = false;

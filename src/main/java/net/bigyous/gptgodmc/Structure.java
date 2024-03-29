@@ -1,10 +1,11 @@
 package net.bigyous.gptgodmc;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.World;
-
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
@@ -72,12 +73,16 @@ public class Structure {
         return false;
     }
 
-    public HashSet<Vector> getBlocks(){
-        return blocks;
+    public List<Block> getBlocks(){
+        return blocks.stream().map((Vector vector) -> {return WorldManager.getCurrentWorld().getBlockAt(vector.getBlockX(), vector.getBlockY(), vector.getBlockZ());}).toList();
+    }
+
+    public HashSet<Vector> getVectors(){
+        return this.blocks;
     }
 
     public void merge(Structure other){
-        blocks.addAll(other.getBlocks());
+        blocks.addAll(other.getVectors());
     }
 
     public int getSize(){
