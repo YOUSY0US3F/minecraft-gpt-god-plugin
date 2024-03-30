@@ -77,6 +77,9 @@ public class EventLogger {
         summarize(out);
         return out;
     }
+    public static String debugOut(){
+        return String.join("\n", flushLogs());
+    }
     public static boolean hasSummary(){
         return summary != null;
     }

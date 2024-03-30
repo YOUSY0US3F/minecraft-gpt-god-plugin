@@ -1,5 +1,6 @@
 package net.bigyous.gptgodmc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.GameMode;
@@ -55,7 +56,13 @@ public class ServerInfoSummarizer {
     }
 
     private static String getDangerLevel(Player player) {
-        List<Entity> nearby = player.getNearbyEntities(4, 3, 4);
+        // can't use getNearbyEntities because it is not Thread safe
+        List<Entity> nearby = new ArrayList<Entity>();
+        for(Entity entity : player.getChunk().getEntities()){
+            if(player.getLocation().distanceSquared(entity.getLocation()) <= 25){
+                nearby.add(entity);
+            }
+        }
         List<Entity> enemies = nearby.stream().filter((Entity entity) -> entity instanceof Enemy).toList();
         List<Entity> bosses = nearby.stream().filter((Entity entity) -> entity instanceof Boss).toList();
         if (enemies.size() < 1 && bosses.size() < 1) {
