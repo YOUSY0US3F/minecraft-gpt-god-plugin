@@ -132,7 +132,7 @@ public class ServerInfoSummarizer {
                 // sb.append("\tInventory: " + inventoryInfo + "\n");
                 // sb.append(isDead? "Dead\n" : "Alive\n");
                 sb.append(isSleeping ? "Asleep\n" : "");
-                sb.append("Danger Level: " + getDangerLevel(player));
+                sb.append("Danger Level: " + getDangerLevel(player) + "\n");
                 sb.append(inventoryInfo + "\n");
             }
         }
