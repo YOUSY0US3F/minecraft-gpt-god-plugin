@@ -5,21 +5,29 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
 import org.bukkit.event.Listener;
+
+import net.bigyous.gptgodmc.loggables.AchievementLoggable;
 import net.bigyous.gptgodmc.loggables.AttackLoggable;
 import net.bigyous.gptgodmc.loggables.DamageLoggable;
 import net.bigyous.gptgodmc.loggables.ItemPickupLoggable;
 import net.bigyous.gptgodmc.loggables.MountLoggable;
+import net.bigyous.gptgodmc.loggables.RenameEntityEvent;
+import net.bigyous.gptgodmc.loggables.RenameItemLoggable;
 import net.bigyous.gptgodmc.loggables.SleepTogetherLoggable;
 import net.bigyous.gptgodmc.loggables.SpecialBlockPlaceEventLoggable;
 import net.bigyous.gptgodmc.loggables.UseLoggable;
@@ -32,6 +40,7 @@ import net.bigyous.gptgodmc.loggables.EatingLoggable;
 import net.bigyous.gptgodmc.loggables.ExplosionLoggable;
 import net.bigyous.gptgodmc.loggables.ChatLoggable;
 import net.bigyous.gptgodmc.loggables.CombustLoggable;
+import net.bigyous.gptgodmc.loggables.CraftLoggable;
 import io.papermc.paper.event.player.AsyncChatEvent;
 
 import org.bukkit.event.EventHandler;
@@ -53,7 +62,7 @@ public class LoggableEventHandler implements Listener {
         EventLogger.addLoggable(new ChatLoggable(event.getPlayer().getName(), ((TextComponent)event.message()).content()));
         // dbg: dump logs
         GPTGOD.LOGGER.info("=== DUMPED LOGS: ===");
-        GPTGOD.LOGGER.info(EventLogger.dump());
+        GPTGOD.LOGGER.info(EventLogger.debugOut());
         GPTGOD.LOGGER.info("====================");
     }
 
@@ -142,5 +151,25 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onMount(EntityMountEvent event){
         EventLogger.addLoggable(new MountLoggable(event));
+    }
+
+    @EventHandler
+    public static void onCraft(CraftItemEvent event){
+        EventLogger.addLoggable(new CraftLoggable(event));
+    }
+
+    @EventHandler
+    public static void onAchievement(PlayerAdvancementDoneEvent event){
+        EventLogger.addLoggable(new AchievementLoggable(event));
+    }
+
+    @EventHandler
+    public static void onItemNamed(PrepareAnvilEvent event){
+        EventLogger.addLoggable(new RenameItemLoggable(event));
+    }
+
+    @EventHandler
+    public static void onEntityRename(PlayerInteractEntityEvent event){
+        EventLogger.addLoggable(new RenameEntityEvent(event));
     }
 }
