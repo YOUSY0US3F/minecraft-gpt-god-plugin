@@ -14,6 +14,7 @@ import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -32,8 +33,10 @@ import net.bigyous.gptgodmc.GPT.Json.ToolCall;
 import net.bigyous.gptgodmc.interfaces.Function;
 import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParser;
@@ -99,19 +102,26 @@ public class GptActions {
         String position = gson.fromJson(argObject.get("position"), String.class);
         String entityName = gson.fromJson(argObject.get("entity"), String.class);
         int count = gson.fromJson(argObject.get("count"), Integer.class);
+        String customName = gson.fromJson(argObject.get("customName"), String.class);
         Location location = StructureManager.hasStructure(position)
                 ? StructureManager.getStructure(position).getLocation()
                 : GPTGOD.SERVER.getPlayer(position).getLocation();
         EntityType type = EntityType.fromName(entityName);
         for (int i = 0; i < count; i++) {
             double r = Math.random() / Math.nextDown(1.0);
-            double offset = 0 * (1.0 - 1) + 3 * r;     
-            WorldManager.getCurrentWorld().spawnEntity(
+            double offset = 0 * (1.0 - 1) + 3 * r;
+            Entity ent = WorldManager.getCurrentWorld().spawnEntity(
                     location.offset(offset - i, 0, offset + i).toLocation(WorldManager.getCurrentWorld()),
                     type, true);
+            TextComponent nameComponent = customName != null
+                    ? PlainTextComponentSerializer.plainText()
+                            .deserialize(String.format("customName%s", i > 0 ? " " + String.valueOf(i) : ""))
+                    : null;
+            ent.customName(nameComponent);
         }
         EventLogger.addLoggable(
-                new GPTActionLoggable(String.format("summoned %d %s near %s", count, entityName, position)));
+                new GPTActionLoggable(String.format("summoned %d %s%s near %s", count, entityName,
+                        customName != null ? String.format(" named: %s,", customName) : "", position)));
     };
     private static Function<String> summonSupplyChest = (String args) -> {
         TypeToken<List<String>> stringArrayType = new TypeToken<List<String>>() {
@@ -125,12 +135,16 @@ public class GptActions {
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
-        Block currentBlock = WorldManager.getCurrentWorld().getBlockAt(playerLoc.offset(playerLoc.getDirection().getBlockX() + 1, 0, playerLoc.getDirection().getBlockZ() + 1).toLocation(null));
+        Block currentBlock = WorldManager.getCurrentWorld()
+                .getBlockAt(playerLoc
+                        .offset(playerLoc.getDirection().getBlockX() + 1, 0, playerLoc.getDirection().getBlockZ() + 1)
+                        .toLocation(null));
         currentBlock.setType(Material.CHEST);
         Chest chest = (Chest) currentBlock.getState();
         chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
         chest.open();
-        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100, 2, 3, 2);
+        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100, 2,
+                3, 2);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
                 String.join(", ", itemNames), playerName)));
     };
@@ -142,7 +156,8 @@ public class GptActions {
         StructureManager.getStructure(structure).getBlocks()
                 .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
         EventLogger.addLoggable(
-                new GPTActionLoggable(String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
+                new GPTActionLoggable(
+                        String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
     };
     private static Function<String> revive = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -153,10 +168,24 @@ public class GptActions {
         if (player.getGameMode().equals(GameMode.SURVIVAL)) {
             return;
         }
-        Location spawn = player.getLastDeathLocation() != null ? player.getLastDeathLocation() : WorldManager.getCurrentWorld().getSpawnLocation();
+        Location spawn = player.getLastDeathLocation() != null ? player.getLastDeathLocation()
+                : WorldManager.getCurrentWorld().getSpawnLocation();
         player.teleport(spawn);
         player.setGameMode(GameMode.SURVIVAL);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("revived %s", playerName)));
+    };
+    private static Function<String> teleport = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String playerName = argsMap.get("playerName");
+        String destName = argsMap.get("destination");
+        Player player = GPTGOD.SERVER.getPlayer(playerName);
+        Location destination = StructureManager.hasStructure(destName)
+                ? StructureManager.getStructure(destName).getLocation()
+                : GPTGOD.SERVER.getPlayer(destName).getLocation();
+        player.teleport(destination);
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("teleported %s to %s", playerName, destName)));
     };
     private static Function<String> detonateStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -193,16 +222,20 @@ public class GptActions {
                             transformStructure)),
             Map.entry("spawnEntity", new GptFunction("spawnEntity",
                     "spawn any minecraft entity next to a player or structure",
-                    Map.of("position", new Parameter("String", "name of the Player or Structure"),
+                    Map.of("position", new Parameter("string", "name of the Player or Structure"),
                             "entity",
-                            new Parameter("String",
+                            new Parameter("string",
                                     "the name of the minecraft entity name will be underscore deliminated eg. \"mushroom_cow\""),
-                            "count", new Parameter("number", "the amount of the entity that will be spawned")),
+                            "count", new Parameter("number", "the amount of the entity that will be spawned"),
+                            "customName",
+                            new Parameter("string",
+                                    "(optional) custom name that will be gives to the spawned entities, set to null to leave entities unnamed")),
                     spawnEntity)),
             Map.entry("summonSupplyChest", new GptFunction("summonSupplyChest",
                     "spawn chest full of items next to a player",
                     Map.of("items",
-                            new Parameter("array", "names of the minecraft items you would like to put in the chest, each item takes up one of 8 slots",
+                            new Parameter("array",
+                                    "names of the minecraft items you would like to put in the chest, each item takes up one of 8 slots",
                                     "string"),
                             "fullStacks", new Parameter("boolean", "put the maximum stack size of each item?"),
                             "playerName",
@@ -211,6 +244,12 @@ public class GptActions {
             Map.entry("revive",
                     new GptFunction("revive", "bring a player back from the dead",
                             Map.of("playerName", new Parameter("string", "The name of the player")), revive)),
+            Map.entry("teleport", new GptFunction("teleport", "teleport a player to another player or a structure",
+                    Map.of("playerName", new Parameter("playerName", "name of the player to be teleported"),
+                            "destination",
+                            new Parameter("destination",
+                                    "The name of the player or Structure the player will be sent to")),
+                    teleport)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
                     Map.of("structure", new Parameter("string", "name of the structure"),
                             "setFire", new Parameter("boolean", "will this explosion cause fires?"),
