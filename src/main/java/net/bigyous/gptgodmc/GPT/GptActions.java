@@ -115,7 +115,7 @@ public class GptActions {
                     type, true);
             TextComponent nameComponent = customName != null
                     ? PlainTextComponentSerializer.plainText()
-                            .deserialize(String.format("customName%s", i > 0 ? " " + String.valueOf(i) : ""))
+                            .deserialize(String.format("%s%s", customName, i > 0 ? " " + String.valueOf(i) : ""))
                     : null;
             ent.customName(nameComponent);
         }

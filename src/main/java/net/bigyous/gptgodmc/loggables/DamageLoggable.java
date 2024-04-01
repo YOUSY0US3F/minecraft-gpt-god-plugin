@@ -1,6 +1,9 @@
 package net.bigyous.gptgodmc.loggables;
 
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent;
+
+import net.bigyous.gptgodmc.GPTGOD;
 
 public class DamageLoggable extends BaseLoggable {
     private String entityName;
@@ -13,6 +16,10 @@ public class DamageLoggable extends BaseLoggable {
         this.damageAmount = event.getDamage();
         if(event.getDamageSource().getDirectEntity() != null){
             this.damageSource = event.getDamageSource().getDirectEntity().getName();
+            if(event.getDamageSource().getDirectEntity() instanceof Projectile){
+                Projectile projectile = (Projectile) event.getDamageSource().getDirectEntity();
+                damageSource = projectile.getOwnerUniqueId() != null? GPTGOD.SERVER.getEntity(projectile.getOwnerUniqueId()).getName(): damageSource;
+            }
             this.isValid = true;
         }
         else{
