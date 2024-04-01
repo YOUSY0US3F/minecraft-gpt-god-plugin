@@ -1,17 +1,34 @@
 package net.bigyous.gptgodmc.loggables;
 
-import org.bukkit.event.inventory.PrepareAnvilEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.AnvilInventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-public class RenameItemLoggable extends BaseLoggable{
+import net.bigyous.gptgodmc.GPT.Moderation;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+
+public class RenameItemLoggable extends BaseLoggable implements UserInputLoggable{
     private String item;
-    private String newName;
+    protected String newName;
     protected String player;
-    protected boolean isValid;
-    public RenameItemLoggable(PrepareAnvilEvent event){
+    protected boolean isValid = false;
+    private ItemStack actualItem;
+    public RenameItemLoggable(InventoryClickEvent event){
         this.player = event.getView().getPlayer().getName();
-        this.item = event.getResult() != null ? event.getResult().getType().name() : null;
-        this.isValid = event.getInventory().getRenameText() != "" && item != null;
-        this.newName = event.getInventory().getRenameText();
+        if(event.getInventory() instanceof AnvilInventory){
+            if(event.getRawSlot() == 2){
+                this.actualItem = event.getCurrentItem();
+                this.newName = actualItem != null && actualItem.hasItemMeta() ? 
+                PlainTextComponentSerializer.plainText().serialize(actualItem.getItemMeta().displayName())
+                : null;
+                if(newName != null){
+                    this.item = actualItem.getType().toString();
+                    this.isValid = true;
+                    Moderation.moderateUserInput(newName, this);
+                }
+            }
+        }
     }
 
     @Override
@@ -21,10 +38,20 @@ public class RenameItemLoggable extends BaseLoggable{
         return String.format("%s renamed their %s to \"%s\"", player, item, newName);
     }
 
+    // @Override
+    // public boolean combine(Loggable l) {
+    //     if(!(l instanceof RenameItemLoggable)) return false;
+    //     RenameItemLoggable other = (RenameItemLoggable) l;
+    //     if(this.player.equals(other.player) && isValid){
+    //         this.newName = other.newName;
+    //         return true;
+    //     }
+    //     return false;
+    // }
+
     @Override
-    public boolean combine(Loggable l) {
-        if(!(l instanceof RenameItemLoggable)) return false;
-        RenameItemLoggable other = (RenameItemLoggable) l;
-        return this.player.equals(other.player) && isValid;
+    public void updateUserInput(String input) {
+        this.newName = input;
+        actualItem.setItemMeta(null);
     }
 }

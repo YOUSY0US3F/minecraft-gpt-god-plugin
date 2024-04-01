@@ -115,7 +115,7 @@ public class GptAPI {
                 GptActions.processResponse(out);
                 client.close();
             } catch (IOException e) {
-                GPTGOD.LOGGER.error("There was an error maing a request to GPT", e);
+                GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
             }
             this.isSending = false;
             Thread.currentThread().interrupt();
@@ -145,7 +145,7 @@ public class GptAPI {
                 GptActions.processResponse(out, functions);
                 client.close();
             } catch (IOException e) {
-                GPTGOD.LOGGER.error("There was an error maing a request to GPT", e);
+                GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
             }
             this.isSending = false;
             Thread.currentThread().interrupt();

@@ -261,7 +261,7 @@ public class GptActions {
     }
 
     private static void dispatch(String command, CommandSender console) {
-        if (command.matches(".*\\bgive\\b.*")) {
+        if (command.matches(".*\\bgive\\b.*") || command.contains(" in ")) {
             GPTGOD.SERVER.dispatchCommand(console, command);
         } else {
             command = command.replaceAll("\\/|(execute )", "");

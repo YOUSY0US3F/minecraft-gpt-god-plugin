@@ -16,6 +16,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
@@ -164,7 +165,7 @@ public class LoggableEventHandler implements Listener {
     }
 
     @EventHandler
-    public static void onItemNamed(PrepareAnvilEvent event){
+    public static void onItemNamed(InventoryClickEvent event){
         EventLogger.addLoggable(new RenameItemLoggable(event));
     }
 
