@@ -32,12 +32,12 @@ public class ChatLoggable implements Loggable, UserInputLoggable {
     }
 
     public boolean combine(Loggable event) {
-        if (!(event instanceof ChatLoggable)) return false;
-        ChatLoggable other = (ChatLoggable) event;
-        if(other.playerName.equals(this.playerName)){
-            this.message = String.format("%s. %s", this.message, other.message);
-            return true;
-        }
+        // if (!(event instanceof ChatLoggable)) return false;
+        // ChatLoggable other = (ChatLoggable) event;
+        // if(other.playerName.equals(this.playerName)){
+        //     this.message = String.format("%s. %s", this.message, other.message);
+        //     return true;
+        // }
         return false;
     }
 

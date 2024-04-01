@@ -1,11 +1,13 @@
 package net.bigyous.gptgodmc.GPT;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -16,6 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.ModerationResult;
@@ -29,12 +32,15 @@ public class Moderation {
         CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(() -> {
             String auth = JavaPlugin.getPlugin(GPTGOD.class).getConfig().getString("openAiKey");
-            String payload = gson.toJson(Map.of("input", input));
+            TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+            };
+            String payload = gson.toJson(Collections.singletonMap("input", input), mapType.getType());
             try {
-                StringEntity data = new StringEntity(payload);
+                StringEntity data = new StringEntity(payload, ContentType.APPLICATION_JSON);
                 HttpPost post = new HttpPost(MODERATION_URL);
                 post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + auth);
                 post.setEntity(data);
+                GPTGOD.LOGGER.info("sending Moderation data to OpenAi: "+ payload);
                 HttpResponse response = client.execute(post);
                 String raw = new String(response.getEntity().getContent().readAllBytes());
                 EntityUtils.consume(response.getEntity());

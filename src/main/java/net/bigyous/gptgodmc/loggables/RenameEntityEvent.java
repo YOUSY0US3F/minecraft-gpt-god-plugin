@@ -5,6 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
+import net.bigyous.gptgodmc.GPT.Moderation;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class RenameEntityEvent extends BaseLoggable implements UserInputLoggable {
@@ -20,6 +21,8 @@ public class RenameEntityEvent extends BaseLoggable implements UserInputLoggable
         this.isValid = item.getType().equals(Material.NAME_TAG) && item.hasItemMeta() && item.getItemMeta().hasDisplayName();
         this.name = isValid ? PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName()) : null;
         this.entity = event.getRightClicked().getName();
+        this.actualEntity = event.getRightClicked();
+        Moderation.moderateUserInput(name, this);
     }
 
     @Override
