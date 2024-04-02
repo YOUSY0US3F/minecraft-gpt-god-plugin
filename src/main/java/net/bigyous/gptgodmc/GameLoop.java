@@ -1,15 +1,13 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethods.List;
 
 import net.bigyous.gptgodmc.GPT.GPTModels;
 import net.bigyous.gptgodmc.GPT.GptAPI;
 import net.bigyous.gptgodmc.GPT.GptActions;
-import net.bigyous.gptgodmc.GPT.Json.GptModel;
+import net.bigyous.gptgodmc.GPT.Personality;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 
 import java.util.ArrayList;
@@ -23,9 +21,10 @@ public class GameLoop {
     private static int taskId;
     public static boolean isRunning = false;
     private static String PROMPT;
-    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. You must use the Tool calls";
-    private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players.";
+    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. You must use the Tool calls. %s";
+    private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
+    private static String personality; 
     // converts seconds into ticks
     private static long seconds(long seconds){
         return seconds * 20;
@@ -35,11 +34,13 @@ public class GameLoop {
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimer(plugin, new GPTTask(), seconds(30), seconds(40));
         taskId = task.getTaskId();
         if(config.contains("prompt") && !config.getString("prompt").isBlank()){
+            personality = Personality.generatePersonality();
             PROMPT= config.getString("prompt");
-            Action_GPT_API.addContext(String.format(ACTION_PROMPT_TEMPLATE, PROMPT), "prompt");
+            String actionPrompt = String.format(ACTION_PROMPT_TEMPLATE, PROMPT, personality);
+            Action_GPT_API.addContext(actionPrompt, "prompt");
             
             // the roles system and user are each one token so we add two to this number
-            staticTokens = GPTUtils.countTokens(PROMPT) + 2;
+            staticTokens = GPTUtils.countTokens(actionPrompt) + 2;
         }
         else{
             GPTGOD.LOGGER.error("no prompt set in config file, the plugin wont work as intended!");
@@ -71,7 +72,7 @@ public class GameLoop {
     }
 
     private static void sendSpeechActions(){
-        Speech_GPT_API.addContext(String.format(SPEECH_PROMPT_TEPLATE, PROMPT, getPreviousActions()), "prompt");
+        Speech_GPT_API.addContext(String.format(SPEECH_PROMPT_TEPLATE, PROMPT, getPreviousActions(), personality), "prompt");
         Speech_GPT_API.send();
     }
 

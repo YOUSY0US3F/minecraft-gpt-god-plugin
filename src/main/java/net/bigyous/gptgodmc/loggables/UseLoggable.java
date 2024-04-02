@@ -5,10 +5,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
 
 public class UseLoggable extends BaseLoggable{
 
-    private String blockName;
-    private String playerName;
-    private String item;
-    private Action action;
+    protected String blockName;
+    protected String playerName;
+    protected String item;
+    protected Action action;
     
     public UseLoggable(PlayerInteractEvent event){
         this.blockName = event.hasBlock()? event.getClickedBlock().getType().toString() : null;
@@ -26,5 +26,17 @@ public class UseLoggable extends BaseLoggable{
             return String.format("%s triggered %s", playerName, blockName);
         }
         return null;
+    }
+
+    public boolean equals(UseLoggable loggable){
+        return this.playerName.equals(loggable.playerName) && 
+        this.blockName.equals(loggable.blockName) && 
+        this.action.equals(loggable.action) && 
+        this.item.equals(loggable.item);
+    }
+
+    @Override
+    public boolean combine(Loggable l) {
+        return this.equals(l);
     }
 }
