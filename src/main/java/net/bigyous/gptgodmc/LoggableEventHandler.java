@@ -3,6 +3,8 @@ package net.bigyous.gptgodmc;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityMountEvent;
+import org.bukkit.event.entity.EntityShootBowEvent;
+import org.bukkit.event.entity.EntityTameEvent;
 import org.bukkit.event.entity.EntityCombustByEntityEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
@@ -28,8 +30,10 @@ import net.bigyous.gptgodmc.loggables.ItemPickupLoggable;
 import net.bigyous.gptgodmc.loggables.MountLoggable;
 import net.bigyous.gptgodmc.loggables.RenameEntityEvent;
 import net.bigyous.gptgodmc.loggables.RenameItemLoggable;
+import net.bigyous.gptgodmc.loggables.ShootLoggable;
 import net.bigyous.gptgodmc.loggables.SleepTogetherLoggable;
 import net.bigyous.gptgodmc.loggables.SpecialBlockPlaceEventLoggable;
+import net.bigyous.gptgodmc.loggables.TameAnimalLoggable;
 import net.bigyous.gptgodmc.loggables.UseLoggable;
 import net.bigyous.gptgodmc.loggables.WriteOnSignLoggable;
 import net.kyori.adventure.text.TextComponent;
@@ -171,5 +175,15 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onEntityRename(PlayerInteractEntityEvent event){
         EventLogger.addLoggable(new RenameEntityEvent(event));
+    }
+
+    @EventHandler
+    public static void onShoot(EntityShootBowEvent event){
+        EventLogger.addLoggable(new ShootLoggable(event));
+    }
+
+    @EventHandler
+    public static void onTame(EntityTameEvent event){
+        EventLogger.addLoggable(new TameAnimalLoggable(event));
     }
 }

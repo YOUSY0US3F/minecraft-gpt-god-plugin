@@ -1,40 +1,39 @@
 package net.bigyous.gptgodmc.utils;
 
 import org.bukkit.entity.Player;
+import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
+
+import java.util.Collection;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
- 
+import org.bukkit.entity.LivingEntity;
+
 public class Targeter {
- 
-    public static Player getTargetPlayer(final Player player) {
-        return getTarget(player, player.getWorld().getPlayers());
-    }
- 
-    public static Entity getTargetEntity(final Entity entity) {
-        return getTarget(entity, entity.getWorld().getEntities());
-    }
- 
-    public static <T extends Entity> T getTarget(final Entity entity,
-            final Iterable<T> entities) {
+
+    public static Entity getTarget(LivingEntity entity) {
         if (entity == null)
             return null;
-        T target = null;
-        final double threshold = 1;
-        for (final T other : entities) {
-            final Vector n = other.getLocation().toVector()
-                    .subtract(entity.getLocation().toVector());
-            if (entity.getLocation().getDirection().normalize().crossProduct(n)
-                    .lengthSquared() < threshold
-                    && n.normalize().dot(
-                            entity.getLocation().getDirection().normalize()) >= 0) {
-                if (target == null
-                        || target.getLocation().distanceSquared(
-                                entity.getLocation()) > other.getLocation()
-                                .distanceSquared(entity.getLocation()))
-                    target = other;
+        Vector direction = entity.getLocation().getDirection();
+        BlockIterator iter = new BlockIterator(entity.getWorld(), entity.getLocation().toVector(),
+                direction, entity.getEyeHeight(), 24);
+        while(iter.hasNext()){
+            Block block = iter.next();
+            if(!block.getType().equals(Material.AIR)){
+                break;
             }
+            Collection<Entity> nearby = block.getLocation().getNearbyEntities(1, 1, 1);
+            if(!nearby.isEmpty()){
+                if(nearby.size() > 1 || !nearby.contains(entity)){
+                    return nearby.stream().filter(e -> !entity.name().equals(e.name())).findFirst().get();
+                }
+                
+            }
+
         }
-        return target;
+        return null;
     }
- 
+
 }

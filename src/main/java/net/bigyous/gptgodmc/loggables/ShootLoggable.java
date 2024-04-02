@@ -17,7 +17,7 @@ public class ShootLoggable extends BaseLoggable {
         if(isValid){
             LivingEntity ent = event.getEntity();
             shooter = ent.getName();
-            Entity targetEnt = Targeter.getTargetEntity(ent);
+            Entity targetEnt = Targeter.getTarget(ent);
             isValid = targetEnt != null;
             this.target = isValid? targetEnt.getName() : null;
         }
