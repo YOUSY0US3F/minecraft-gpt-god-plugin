@@ -9,14 +9,14 @@ public class Personality {
             "killing animals",
             "fighting other players",
             "slaying monsters",
-            "using hostile lanhuage",
+            "using hostile language",
             "using friendly language",
             "crafting",
             "building",
             "helping other players",
             "connecting with nature",
             "using fire and explosions",
-            "expressing love",
+            "love between players",
             "generosity",
             "ritual sacrifice");
     private static String briefing = "The following are behaviours you like and dislike, use these to inform your decsions";

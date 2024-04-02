@@ -1,16 +1,13 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
-import org.checkerframework.checker.calledmethods.qual.EnsuresCalledMethods.List;
 
 import net.bigyous.gptgodmc.GPT.GPTModels;
 import net.bigyous.gptgodmc.GPT.GptAPI;
 import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.GPT.Personality;
-import net.bigyous.gptgodmc.GPT.Json.GptModel;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 
 import java.util.ArrayList;
