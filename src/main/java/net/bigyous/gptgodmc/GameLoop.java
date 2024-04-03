@@ -86,8 +86,8 @@ public class GameLoop {
                 }
                 int nonLogTokens = staticTokens;
                 if(EventLogger.hasSummary()) {
-                    Action_GPT_API.addLogs(EventLogger.getSummary(), "summary", 1);
-                    Speech_GPT_API.addLogs(EventLogger.getSummary(), "summary", 1);
+                    Action_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
+                    Speech_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
                     nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary()) + 1;
                 }
                 EventLogger.cull(Action_GPT_API.getMaxTokens() - nonLogTokens);
