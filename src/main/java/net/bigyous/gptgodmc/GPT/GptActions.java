@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -19,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
@@ -129,24 +131,30 @@ public class GptActions {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
         List<String> itemNames = gson.fromJson(argObject.get("items"), stringArrayType);
-        boolean fullStacks = gson.fromJson(argObject.get("fullStacks"), Boolean.class);
+        boolean fullStacks = gson.fromJson(argObject.get("fullStacks"), Boolean.class) != null ? 
+            gson.fromJson(argObject.get("fullStacks"), Boolean.class) : false;
         List<ItemStack> items = itemNames.stream().map((String itemName) -> {
             Material mat = Material.matchMaterial(itemName);
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
-        Block currentBlock = WorldManager.getCurrentWorld()
-                .getBlockAt(playerLoc
-                        .offset(playerLoc.getDirection().getBlockX() + 1, 0, playerLoc.getDirection().getBlockZ() + 1)
-                        .toLocation(null));
-        currentBlock.setType(Material.CHEST);
-        Chest chest = (Chest) currentBlock.getState();
-        chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
-        chest.open();
-        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100, 2,
-                3, 2);
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
-                String.join(", ", itemNames), playerName)));
+        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+            Block currentBlock = WorldManager.getCurrentWorld()
+                    .getBlockAt(playerLoc
+                            .offset(playerLoc.getDirection().getBlockX() + 1, 0,
+                                    playerLoc.getDirection().getBlockZ() + 1)
+                            .toLocation(null));
+            currentBlock.setType(Material.CHEST);
+            Chest chest = (Chest) currentBlock.getState();
+            chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
+            chest.open();
+            WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100,
+                    2,
+                    3, 2);
+            EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
+                    String.join(", ", itemNames), playerName)));
+        });
+
     };
     private static Function<String> transformStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -245,9 +253,9 @@ public class GptActions {
                     new GptFunction("revive", "bring a player back from the dead",
                             Map.of("playerName", new Parameter("string", "The name of the player")), revive)),
             Map.entry("teleport", new GptFunction("teleport", "teleport a player to another player or a structure",
-                    Map.of("playerName", new Parameter("playerName", "name of the player to be teleported"),
+                    Map.of("playerName", new Parameter("string", "name of the player to be teleported"),
                             "destination",
-                            new Parameter("destination",
+                            new Parameter("string",
                                     "The name of the player or Structure the player will be sent to")),
                     teleport)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",

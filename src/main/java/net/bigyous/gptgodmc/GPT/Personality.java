@@ -10,6 +10,7 @@ public class Personality {
             "fighting other players",
             "slaying monsters",
             "using hostile language",
+            "using vulgar language",
             "using friendly language",
             "crafting",
             "building",
@@ -18,8 +19,9 @@ public class Personality {
             "using fire and explosions",
             "love between players",
             "generosity",
-            "ritual sacrifice");
-    private static String briefing = "The following are behaviours you like and dislike, use these to inform your decsions";
+            "ritual sacrifice",
+            "eating meat");
+    private static String briefing = "The following are behaviours you like and dislike, this is the basis for your personality";
 
     public static String generatePersonality() {
         Collections.shuffle(behaviours);
