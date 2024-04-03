@@ -28,7 +28,7 @@ public class Personality {
         List<String> likes = behaviours.subList(0, 3);
         List<String> dislikes = behaviours.subList(3, 6);
 
-        return String.format("%s: You Like: %s, You Dislike: %s", briefing, String.join(",", likes),
+        return String.format("%s: You Like: %s, You Dislike: %s.", briefing, String.join(",", likes),
                 String.join(",", dislikes));
 
     }
