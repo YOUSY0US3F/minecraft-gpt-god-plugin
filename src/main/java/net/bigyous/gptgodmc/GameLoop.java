@@ -21,7 +21,7 @@ public class GameLoop {
     private static int taskId;
     public static boolean isRunning = false;
     private static String PROMPT;
-    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. You must use the Tool calls. %s";
+    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. %s You must use the Tool calls.";
     private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
     private static String personality; 
