@@ -131,8 +131,9 @@ public class GptActions {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
         List<String> itemNames = gson.fromJson(argObject.get("items"), stringArrayType);
-        boolean fullStacks = gson.fromJson(argObject.get("fullStacks"), Boolean.class) != null ? 
-            gson.fromJson(argObject.get("fullStacks"), Boolean.class) : false;
+        boolean fullStacks = gson.fromJson(argObject.get("fullStacks"), Boolean.class) != null
+                ? gson.fromJson(argObject.get("fullStacks"), Boolean.class)
+                : false;
         List<ItemStack> items = itemNames.stream().map((String itemName) -> {
             Material mat = Material.matchMaterial(itemName);
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
@@ -161,11 +162,14 @@ public class GptActions {
         String structure = gson.fromJson(argObject.get("structure"), String.class);
         String blockType = gson.fromJson(argObject.get("block"), String.class);
 
-        StructureManager.getStructure(structure).getBlocks()
-                .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
-        EventLogger.addLoggable(
-                new GPTActionLoggable(
-                        String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
+        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+            StructureManager.getStructure(structure).getBlocks()
+                    .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
+            EventLogger.addLoggable(
+                    new GPTActionLoggable(
+                            String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
+        });
+
     };
     private static Function<String> revive = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
