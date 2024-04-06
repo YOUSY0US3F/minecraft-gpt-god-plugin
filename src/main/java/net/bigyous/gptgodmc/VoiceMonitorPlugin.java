@@ -80,7 +80,7 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
         if(player.getGameMode() == GameMode.SPECTATOR){
             return;
         }
-        GPTGOD.LOGGER.info(String.format("Player: %s Sent packet of length: %d", player.getName(), encodedData.length));
+        // GPTGOD.LOGGER.info(String.format("Player: %s Sent packet of length: %d", player.getName(), encodedData.length));
         if (!decoders.containsKey(player.getUniqueId())) {
             decoders.put(player.getUniqueId(), event.getVoicechat().createDecoder());
             // GPTGOD.LOGGER.info(String.format("opusDecoder created for UUID: %s", player.getUniqueId().toString()));

@@ -10,4 +10,8 @@ public class GptFunctionReference {
         this.type = "function";
         this.function = Map.of("name", function.getName());
     }
+    public GptFunctionReference(String name){
+        this.type = "function";
+        this.function = Map.of("name", name);
+    }
 }

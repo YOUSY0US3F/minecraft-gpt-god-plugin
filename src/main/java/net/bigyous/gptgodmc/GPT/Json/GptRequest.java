@@ -20,6 +20,10 @@ public class GptRequest {
         return tools;
     }
 
+    public void setTools(GptTool[] tools) {
+        this.tools = tools;
+    }
+
     public void setModel(GptModel model) {
         this.model = model;
     }

@@ -8,6 +8,7 @@ import net.bigyous.gptgodmc.GPT.GPTModels;
 import net.bigyous.gptgodmc.GPT.GptAPI;
 import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.GPT.Personality;
+import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 
 import java.util.ArrayList;
@@ -16,12 +17,12 @@ public class GameLoop {
     private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
     private static FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
     private static GptAPI Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
-    private static GptAPI Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools());
+    private static GptAPI Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools()).setToolChoice(new GptFunctionReference("sendMessage"));
     private static int staticTokens = 0;
     private static int taskId;
     public static boolean isRunning = false;
     private static String PROMPT;
-    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. %s You must use the Tool calls.";
+    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. %s";
     private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
     private static String personality; 
@@ -66,7 +67,7 @@ public class GameLoop {
         if(previousActions.isEmpty()){
             return "";
         }
-        String out = " You Just did these actions: " + String.join(",", previousActions);
+        String out = " You Just: " + String.join(",", previousActions);
         previousActions = new ArrayList<String>();
         return out;
     }
@@ -92,7 +93,7 @@ public class GameLoop {
                 }
                 EventLogger.cull(Action_GPT_API.getMaxTokens() - nonLogTokens);
                 String log = EventLogger.dump();
-                Action_GPT_API.addLogs(log, "log");
+                Action_GPT_API.addLogs(log, "log").setToolChoice(GptActions.GetActionTools());
                 Speech_GPT_API.addLogs(log, "log");
                 previousActions = new ArrayList<>();
                 Action_GPT_API.send();

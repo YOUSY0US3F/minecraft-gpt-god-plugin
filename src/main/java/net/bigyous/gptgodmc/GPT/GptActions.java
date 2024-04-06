@@ -34,6 +34,7 @@ import net.bigyous.gptgodmc.GPT.Json.Parameter;
 import net.bigyous.gptgodmc.GPT.Json.ToolCall;
 import net.bigyous.gptgodmc.interfaces.Function;
 import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
+import net.bigyous.gptgodmc.utils.GPTUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -49,25 +50,34 @@ public class GptActions {
     private int tokens = -1;
     private static Gson gson = new Gson();
 
-    private static Function<String> whisper = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
-        };
-        Map<String, String> argsMap = gson.fromJson(args, mapType);
-        Player player = GPTGOD.SERVER.getPlayerExact(argsMap.get("playerName"));
+    private static void whisper(String playerName, String message) {
+        Player player = GPTGOD.SERVER.getPlayerExact(playerName);
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
-        player.sendMessage(argsMap.get("message"));
+        player.sendMessage(message);
         EventLogger.addLoggable(new GPTActionLoggable(
-                String.format("whispered \"%s\" to %s", argsMap.get("message"), argsMap.get("playerName"))));
-    };
-    private static Function<String> announce = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
-        };
-        Map<String, String> argsMap = gson.fromJson(args, mapType);
+                String.format("whispered \"%s\" to %s", message, playerName)));
+    }
+
+    private static void announce(String message) {
         GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW)
                 .decoration(TextDecoration.BOLD, true));
-        GPTGOD.SERVER.broadcast(Component.text(argsMap.get("message"), NamedTextColor.LIGHT_PURPLE)
+        GPTGOD.SERVER.broadcast(Component.text(message, NamedTextColor.LIGHT_PURPLE)
                 .decoration(TextDecoration.BOLD, true));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", argsMap.get("message"))));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", message)));
+    }
+
+    private static Function<String> sendMessage = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String message =  argsMap.get("message");
+        if(argsMap.containsKey("playerName") && argsMap.get("playerName") != null){
+            whisper(argsMap.get("playerName"),message);
+            return;
+        }
+        else{
+            announce(message);
+        }
     };
     private static Function<String> giveItem = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -136,7 +146,7 @@ public class GptActions {
                 : false;
         List<ItemStack> items = itemNames.stream().map((String itemName) -> {
             Material mat = Material.matchMaterial(itemName);
-            if(mat == null){
+            if (mat == null) {
                 return new ItemStack(Material.COBWEB);
             }
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
@@ -211,13 +221,10 @@ public class GptActions {
         EventLogger.addLoggable(new GPTActionLoggable(String.format("detonated Structure: %s", structure)));
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
-            Map.entry("whisper", new GptFunction("whisper", "send a private message to a player",
-                    Map.of("playerName", new Parameter("string", "name of the Player"),
-                            "message", new Parameter("string", "message")),
-                    whisper)),
-
-            Map.entry("announce", new GptFunction("announce", "announce a message to every player",
-                    Collections.singletonMap("message", new Parameter("string", "message")), announce)),
+            Map.entry("sendMessage", new GptFunction("sendMessage", "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server.",
+                    Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
+                            "message", new Parameter("string", "the message")),
+                    sendMessage)),
 
             Map.entry("giveItem", new GptFunction("giveItem", "give a player any amount of an item",
                     Map.of("playerName", new Parameter("string", "name of the Player"),
@@ -277,7 +284,7 @@ public class GptActions {
     private static GptTool[] tools;
     private static GptTool[] actionTools;
     private static GptTool[] speechTools;
-    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper");
+    private static final List<String> speechActionKeys = Arrays.asList("sendMessage");
 
     public static GptTool[] wrapFunctions(Map<String, GptFunction> functions) {
         GptFunction[] funcList = functions.values().toArray(new GptFunction[functions.size()]);
@@ -298,11 +305,11 @@ public class GptActions {
 
     public static GptTool[] GetActionTools() {
         if (actionTools != null && actionTools[0] != null) {
-            return actionTools;
+            return GPTUtils.randomToolSubset(actionTools, 4);
         }
         actionFunctionMap.keySet().removeAll(speechActionKeys);
         actionTools = wrapFunctions(actionFunctionMap);
-        return actionTools;
+        return GPTUtils.randomToolSubset(actionTools, 4);
     }
 
     public static GptTool[] GetSpeechTools() {
