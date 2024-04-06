@@ -59,7 +59,7 @@ public class ServerInfoSummarizer {
         // can't use getNearbyEntities because it is not Thread safe
         List<Entity> nearby = new ArrayList<Entity>();
         for(Entity entity : player.getChunk().getEntities()){
-            if(player.getLocation().distanceSquared(entity.getLocation()) <= 25){
+            if(player.getLocation().distanceSquared(entity.getLocation()) <= 100){
                 nearby.add(entity);
             }
         }

@@ -136,6 +136,9 @@ public class GptActions {
                 : false;
         List<ItemStack> items = itemNames.stream().map((String itemName) -> {
             Material mat = Material.matchMaterial(itemName);
+            if(mat == null){
+                return new ItemStack(Material.COBWEB);
+            }
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
