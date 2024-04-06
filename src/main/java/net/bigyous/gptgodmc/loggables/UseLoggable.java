@@ -1,5 +1,8 @@
 package net.bigyous.gptgodmc.loggables;
 
+import java.util.Set;
+
+import org.bukkit.Material;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
@@ -9,11 +12,36 @@ public class UseLoggable extends BaseLoggable{
     protected String playerName;
     protected String item;
     protected Action action;
+
+    private Set<Material> toolItems = Set.of(
+        Material.FLINT_AND_STEEL, 
+        Material.FIRE_CHARGE, 
+        Material.SHEARS, 
+        Material.BRUSH, 
+        Material.STONE_HOE,
+        Material.STONE_AXE,
+        Material.STONE_SHOVEL,
+        Material.IRON_HOE,
+        Material.IRON_AXE,
+        Material.IRON_SHOVEL,
+        Material.WOODEN_HOE,
+        Material.WOODEN_AXE,
+        Material.WOODEN_SHOVEL,
+        Material.GOLDEN_HOE,
+        Material.GOLDEN_AXE,
+        Material.GOLDEN_SHOVEL,
+        Material.DIAMOND_HOE,
+        Material.DIAMOND_AXE,
+        Material.DIAMOND_SHOVEL,
+        Material.NETHERITE_HOE,
+        Material.NETHERITE_AXE,
+        Material.NETHERITE_SHOVEL
+        );
     
     public UseLoggable(PlayerInteractEvent event){
         this.blockName = event.hasBlock()? event.getClickedBlock().getType().toString() : null;
         this.playerName = event.getPlayer().getName();
-        this.item = event.hasItem() && !event.getItem().getType().isBlock()? event.getItem().getType().toString() : null;
+        this.item = event.hasItem() && toolItems.contains(event.getItem().getType())? event.getItem().getType().toString() : null;
         this.action = event.getAction(); 
     }
 

@@ -1,6 +1,5 @@
 package net.bigyous.gptgodmc.GPT;
 
-import java.sql.Struct;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,7 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -71,7 +69,7 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String message = argsMap.get("message");
-        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null) {
+        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null && !argsMap.get("playerName").isBlank()) {
             whisper(argsMap.get("playerName"), message);
             return;
         } else {
@@ -249,7 +247,7 @@ public class GptActions {
                                     "(optional) custom name that will be gives to the spawned entities, set to null to leave entities unnamed")),
                     spawnEntity)),
             Map.entry("summonSupplyChest", new GptFunction("summonSupplyChest",
-                    "spawn chest full of items next to a player",
+                    "spawn chest full of items for use in a project next to a player",
                     Map.of("items",
                             new Parameter("array",
                                     "names of the minecraft items you would like to put in the chest, each item takes up one of 8 slots",
@@ -361,7 +359,9 @@ public class GptActions {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
-                functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());
+                Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+                    functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());
+                });
             }
         }
     }
