@@ -32,4 +32,12 @@ public class GPTUtils {
         }
         return Arrays.copyOfRange(tools, 0, size);
     }
+
+    public static int calculateToolTokens(GptTool[] tools) {
+        int sum = 0;
+        for(GptTool tool : tools){
+            sum += tool.getFunction().calculateFunctionTokens();
+        }
+        return sum;
+    }
 }

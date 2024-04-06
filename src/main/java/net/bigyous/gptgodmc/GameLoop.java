@@ -9,6 +9,7 @@ import net.bigyous.gptgodmc.GPT.GptAPI;
 import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.GPT.Personality;
 import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
+import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 
 import java.util.ArrayList;
@@ -91,9 +92,12 @@ public class GameLoop {
                     Speech_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
                     nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary()) + 1;
                 }
+                GptTool[] actionTools = GptActions.GetActionTools();
+                Action_GPT_API.setTools(actionTools);
+                nonLogTokens += GPTUtils.calculateToolTokens(actionTools);
                 EventLogger.cull(Action_GPT_API.getMaxTokens() - nonLogTokens);
                 String log = EventLogger.dump();
-                Action_GPT_API.addLogs(log, "log").setToolChoice(GptActions.GetActionTools());
+                Action_GPT_API.addLogs(log, "log");
                 Speech_GPT_API.addLogs(log, "log");
                 previousActions = new ArrayList<>();
                 Action_GPT_API.send();

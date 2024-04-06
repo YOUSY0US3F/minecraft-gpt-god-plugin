@@ -70,12 +70,11 @@ public class GptActions {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        String message =  argsMap.get("message");
-        if(argsMap.containsKey("playerName") && argsMap.get("playerName") != null){
-            whisper(argsMap.get("playerName"),message);
+        String message = argsMap.get("message");
+        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null) {
+            whisper(argsMap.get("playerName"), message);
             return;
-        }
-        else{
+        } else {
             announce(message);
         }
     };
@@ -152,36 +151,31 @@ public class GptActions {
             return new ItemStack(mat, fullStacks ? mat.getMaxStackSize() : 1);
         }).toList();
         Location playerLoc = GPTGOD.SERVER.getPlayer(playerName).getLocation();
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
-            Block currentBlock = WorldManager.getCurrentWorld()
-                    .getBlockAt(playerLoc
-                            .offset(playerLoc.getDirection().getBlockX() + 1, 0,
-                                    playerLoc.getDirection().getBlockZ() + 1)
-                            .toLocation(null));
-            currentBlock.setType(Material.CHEST);
-            Chest chest = (Chest) currentBlock.getState();
-            chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
-            chest.open();
-            WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100,
-                    2,
-                    3, 2);
-            EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
-                    String.join(", ", itemNames), playerName)));
-        });
+        Block currentBlock = WorldManager.getCurrentWorld()
+                .getBlockAt(playerLoc
+                        .offset(playerLoc.getDirection().getBlockX() + 1, 0,
+                                playerLoc.getDirection().getBlockZ() + 1)
+                        .toLocation(null));
+        currentBlock.setType(Material.CHEST);
+        Chest chest = (Chest) currentBlock.getState();
+        chest.getBlockInventory().addItem(items.toArray(new ItemStack[itemNames.size()]));
+        chest.open();
+        WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100,
+                2,
+                3, 2);
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
+                String.join(", ", itemNames), playerName)));
 
     };
     private static Function<String> transformStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String structure = gson.fromJson(argObject.get("structure"), String.class);
         String blockType = gson.fromJson(argObject.get("block"), String.class);
-
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
-            StructureManager.getStructure(structure).getBlocks()
-                    .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
-            EventLogger.addLoggable(
-                    new GPTActionLoggable(
-                            String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
-        });
+        StructureManager.getStructure(structure).getBlocks()
+                .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
+        EventLogger.addLoggable(
+                new GPTActionLoggable(
+                        String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
 
     };
     private static Function<String> revive = (String args) -> {
@@ -221,7 +215,8 @@ public class GptActions {
         EventLogger.addLoggable(new GPTActionLoggable(String.format("detonated Structure: %s", structure)));
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
-            Map.entry("sendMessage", new GptFunction("sendMessage", "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server.",
+            Map.entry("sendMessage", new GptFunction("sendMessage",
+                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server.",
                     Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
                             "message", new Parameter("string", "the message")),
                     sendMessage)),
@@ -304,12 +299,14 @@ public class GptActions {
     }
 
     public static GptTool[] GetActionTools() {
-        if (actionTools != null && actionTools[0] != null) {
-            return GPTUtils.randomToolSubset(actionTools, 4);
+        if (actionTools == null || actionTools[0] == null) {
+            actionFunctionMap.keySet().removeAll(speechActionKeys);
+            actionFunctionMap.keySet().remove("command");
+            actionTools = wrapFunctions(actionFunctionMap);
         }
-        actionFunctionMap.keySet().removeAll(speechActionKeys);
-        actionTools = wrapFunctions(actionFunctionMap);
-        return GPTUtils.randomToolSubset(actionTools, 4);
+        GptTool[] newTools = GPTUtils.randomToolSubset(actionTools, 4);
+        newTools[newTools.length - 1] = new GptTool(functionMap.get("command"));
+        return newTools;
     }
 
     public static GptTool[] GetSpeechTools() {
@@ -345,7 +342,9 @@ public class GptActions {
 
     public static int run(String functionName, String jsonArgs) {
         GPTGOD.LOGGER.info(String.format("running function \"%s\" with json arguments \"%s\"", functionName, jsonArgs));
-        functionMap.get(functionName).runFunction(jsonArgs);
+        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+            functionMap.get(functionName).runFunction(jsonArgs);
+        });
         return 1;
     }
 
