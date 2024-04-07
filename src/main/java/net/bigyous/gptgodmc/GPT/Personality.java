@@ -21,7 +21,7 @@ public class Personality {
             "generosity",
             "ritual sacrifice",
             "eating meat");
-    private static String briefing = "The following are behaviours you must reward or pusish players for doing. Don't explicitly tell the players this list. Your goal is to make the players obey.";
+    private static String briefing = "The following are behaviours you must reward or pusish players for doing. Don't explicitly tell the players this list.";
 
     public static String generatePersonality() {
         Collections.shuffle(behaviours);
