@@ -27,7 +27,7 @@ startingWorld: ""
 use-gpt-4: false
 
 # this will be the prompt provided to Chat-GPT
-prompt: "You will roleplay as the god of a small minecraft island world, the players inhabiting the island have no resources. you will recieve information about whats has happened on the island."
+prompt: "You will roleplay as the god of a small minecraft island world, the island has no passive mobs, the players inhabiting the island have no resources. you will recieve information about whats has happened on the island."
 
 # whether or not the mod will make calls to GPT
 enabled: true
