@@ -3,6 +3,7 @@ package net.bigyous.gptgodmc;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,13 +21,12 @@ import net.bigyous.gptgodmc.loggables.GenericEventLoggable;
 import org.bukkit.entity.Player;
 
 public class StructureManager implements Listener {
-    private static HashMap<String,Structure> structures = new HashMap<String,Structure>();
+    private static ConcurrentHashMap<String,Structure> structures = new ConcurrentHashMap<String,Structure>();
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent event){
         Location newBlock = event.getBlock().getLocation();
         addBlockToStructures(newBlock, event.getPlayer());
-        GPTGOD.LOGGER.info(structures.toString());
     }
 
     @EventHandler
@@ -95,7 +95,7 @@ public class StructureManager implements Listener {
     }
 
     public static void reset(){
-        structures = new HashMap<String,Structure>();
+        structures = new ConcurrentHashMap<String,Structure>();
     }
 
     private static String getStructureThatContains(Location block){

@@ -2,6 +2,8 @@ package net.bigyous.gptgodmc.GPT;
 
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import net.bigyous.gptgodmc.EventLogger;
@@ -20,10 +22,9 @@ import java.util.concurrent.ExecutionException;
 public class SummarizeLogs {
     private static Gson gson = new Gson();
     private static Function<String> submitSummary = (String args) ->{
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>(){};
-        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         GPTGOD.LOGGER.info("summary submitted with args: ", args);
-        EventLogger.setSummary(argsMap.get("summary"));
+        EventLogger.setSummary(gson.fromJson(argObject.get("summary"), String.class));
     };
     private static Map<String, GptFunction> functionMap = Map.of("submitSummary", 
         new GptFunction("submitSummary", "input the summary, keep the summary below 1000 tokens", 
@@ -34,7 +35,6 @@ public class SummarizeLogs {
     .addContext("""
     You are a helpful assistant that will recieve a log of events from a minecraft server, \
     or a summary and a log of events. \
-    the logs start with a summary of Server Information that details the state of all the players and some basic info about the server.
     You will create a short summary based on this information that preserves the plot. \
     If information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts.
     """, "prompt").setToolChoice(new GptFunctionReference(functionMap.get("submitSummary")));
