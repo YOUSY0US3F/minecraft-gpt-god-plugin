@@ -41,6 +41,7 @@ public class RoundSystem implements Listener {
         for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
             revivePlayer(p);
         }
+        GameLoop.init();
     }
 
     public static void revivePlayer(Player player){

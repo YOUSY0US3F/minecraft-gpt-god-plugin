@@ -214,7 +214,7 @@ public class GptActions {
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("sendMessage", new GptFunction("sendMessage",
-                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Limit messages to 150 characters, Avoid repeating things that have already been said.",
+                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Avoid repeating things that have already been said. Keep messages short and concise, no more than 100 characters.",
                     Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
                             "message", new Parameter("string", "the message")),
                     sendMessage)),
@@ -317,12 +317,15 @@ public class GptActions {
     }
 
     private static void dispatch(String command, CommandSender console) {
+        command = command.charAt(0) == '/'? command.substring(1) : command;
         if (command.matches(".*\\bgive\\b.*") || command.contains(" in ")) {
             GPTGOD.SERVER.dispatchCommand(console, command);
         } else {
-            command = command.replaceAll("\\/|(execute )", "");
+            if(!(command.contains(" as ") || command.contains(" at ")) && (command.contains("~") || command.contains("^"))){
+                command = "execute at @r run " + command;
+            }
             GPTGOD.SERVER.dispatchCommand(console,
-                    String.format("execute in %s %s", WorldManager.getDimensionName(), command));
+                    String.format("execute in %s run %s", WorldManager.getDimensionName(), command));
         }
     }
 
@@ -348,6 +351,7 @@ public class GptActions {
 
     public static void processResponse(String response) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
+        if(responseObject == null) return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 run(call.getFunction().getName(), call.getFunction().getArguments());
@@ -357,6 +361,7 @@ public class GptActions {
 
     public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
+        if(responseObject == null) return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
