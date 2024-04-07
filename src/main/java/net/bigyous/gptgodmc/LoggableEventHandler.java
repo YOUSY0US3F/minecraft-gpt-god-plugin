@@ -1,6 +1,7 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
@@ -27,6 +28,7 @@ import net.bigyous.gptgodmc.loggables.AchievementLoggable;
 import net.bigyous.gptgodmc.loggables.AttackLoggable;
 import net.bigyous.gptgodmc.loggables.DamageLoggable;
 import net.bigyous.gptgodmc.loggables.ItemPickupLoggable;
+import net.bigyous.gptgodmc.loggables.KillLoggable;
 import net.bigyous.gptgodmc.loggables.MountLoggable;
 import net.bigyous.gptgodmc.loggables.RenameEntityEvent;
 import net.bigyous.gptgodmc.loggables.RenameItemLoggable;
@@ -185,5 +187,10 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onTame(EntityTameEvent event){
         EventLogger.addLoggable(new TameAnimalLoggable(event));
+    }
+
+    @EventHandler
+    public static void onKill(EntityDeathEvent event){
+        EventLogger.addLoggable(new KillLoggable(event));
     }
 }

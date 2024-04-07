@@ -36,7 +36,7 @@ public class SummarizeLogs {
     or a summary and a log of events. \
     the logs start with a summary of Server Information that details the state of all the players and some basic info about the server.
     You will create a short summary based on this information that preserves the plot. \
-    If information in the logs isn't important to the plot omit it.
+    If information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts.
     """, "prompt").setToolChoice(new GptFunctionReference(functionMap.get("submitSummary")));
 
     public static void summarize(String log, String summary){

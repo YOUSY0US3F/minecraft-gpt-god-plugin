@@ -21,14 +21,14 @@ public class Personality {
             "generosity",
             "ritual sacrifice",
             "eating meat");
-    private static String briefing = "The following are behaviours you like and dislike, this is the basis for your personality";
+    private static String briefing = "The following are behaviours you must reward or pusish players for doing. Don't explicitly tell the players this list.";
 
     public static String generatePersonality() {
         Collections.shuffle(behaviours);
         List<String> likes = behaviours.subList(0, 3);
         List<String> dislikes = behaviours.subList(3, 6);
 
-        return String.format("%s: You Like: %s, You Dislike: %s.", briefing, String.join(",", likes),
+        return String.format("%s: Reward: %s, Punish: %s.", briefing, String.join(",", likes),
                 String.join(",", dislikes));
 
     }
