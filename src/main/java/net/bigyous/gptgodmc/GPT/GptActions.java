@@ -98,12 +98,13 @@ public class GptActions {
                 .addLoggable(new GPTActionLoggable(String.format("commanded \"%s\" to happen", argsMap.get("prompt"))));
     };
     private static Function<String> smite = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
-        };
-        Map<String, String> argsMap = gson.fromJson(args, mapType);
-        String playerName = argsMap.get("playerName");
+        JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
+        String playerName = gson.fromJson(argObject.get("playerName"), String.class);
+        int power = gson.fromJson(argObject.get("power"), Integer.class);
         Player player = GPTGOD.SERVER.getPlayer(playerName);
-        WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
+        for(int i = 0 ; i<power ; i++){
+            WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
+        }
         EventLogger.addLoggable(new GPTActionLoggable(String.format("smited %s", playerName)));
     };
     private static Function<String> spawnEntity = (String args) -> {
@@ -214,7 +215,7 @@ public class GptActions {
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("sendMessage", new GptFunction("sendMessage",
-                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Avoid repeating things that have already been said. Keep messages short and concise, no more than 100 characters.",
+                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
                     Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
                             "message", new Parameter("string", "the message")),
                     sendMessage)),
@@ -229,7 +230,8 @@ public class GptActions {
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
                     command)),
             Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",
-                    Collections.singletonMap("playerName", new Parameter("string", "the player's name")), smite)),
+                    Map.of("playerName", new Parameter("string", "the player's name"),
+                        "power", new Parameter("number", "the strength of this smiting")), smite)),
             Map.entry("transformStructure",
                     new GptFunction("transformStructure", "replace all the blocks in a structure with any block",
                             Map.of("structure", new Parameter("string", "name of the structure"),
@@ -244,7 +246,7 @@ public class GptActions {
                             "count", new Parameter("number", "the amount of the entity that will be spawned"),
                             "customName",
                             new Parameter("string",
-                                    "(optional) custom name that will be gives to the spawned entities, set to null to leave entities unnamed")),
+                                    "(optional) custom name that will be given to the spawned entities, set to null to leave entities unnamed")),
                     spawnEntity)),
             Map.entry("summonSupplyChest", new GptFunction("summonSupplyChest",
                     "spawn chest full of items for use in a project next to a player",
