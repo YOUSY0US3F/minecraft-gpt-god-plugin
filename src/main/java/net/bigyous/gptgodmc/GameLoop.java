@@ -17,8 +17,8 @@ import java.util.ArrayList;
 public class GameLoop {
     private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
     private static FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
-    private static GptAPI Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
-    private static GptAPI Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools()).setToolChoice(new GptFunctionReference("sendMessage"));
+    private static GptAPI Action_GPT_API;
+    private static GptAPI Speech_GPT_API;
     private static int staticTokens = 0;
     private static int taskId;
     public static boolean isRunning = false;
@@ -33,6 +33,8 @@ public class GameLoop {
     }
     public static void init(){
         if(isRunning || !config.getBoolean("enabled")) return;
+        Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
+        Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools()).setToolChoice(new GptFunctionReference("sendMessage"));
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimer(plugin, new GPTTask(), seconds(30), seconds(40));
         taskId = task.getTaskId();
         if(config.contains("prompt") && !config.getString("prompt").isBlank()){
@@ -54,8 +56,8 @@ public class GameLoop {
         if(!isRunning) return;
         GPTGOD.SERVER.getScheduler().cancelTask(taskId);
         EventLogger.reset();
-        Action_GPT_API = new GptAPI(GPTModels.getMainModel());
-        Speech_GPT_API = new GptAPI(GPTModels.getMainModel());
+        Action_GPT_API = null;
+        Speech_GPT_API = null;
         isRunning = false;
         GPTGOD.LOGGER.info("GameLoop Stoppped");
     }

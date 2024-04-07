@@ -214,7 +214,7 @@ public class GptActions {
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("sendMessage", new GptFunction("sendMessage",
-                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server.",
+                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Limit messages to 150 characters, Avoid repeating things that have already been said.",
                     Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
                             "message", new Parameter("string", "the message")),
                     sendMessage)),
