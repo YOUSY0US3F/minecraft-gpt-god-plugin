@@ -62,6 +62,21 @@ public class GptAPI {
         return this;
     }
 
+    public GptAPI addContext(String context, String name, int index) {
+        if (this.messageMap.containsKey(name)) {
+            this.body.replaceMessage(messageMap.get(name), context);
+            return this;
+        }
+        this.body.addMessage("system", context);
+        for (String key : messageMap.keySet()) {
+            if (messageMap.get(key) == index) {
+                messageMap.replace(key, index + 1);
+            }
+        }
+        this.messageMap.put(name, index);
+        return this;
+    }
+
     public GptAPI setTools(GptTool[] tools) {
         this.body.setTools(tools);
         return this;
