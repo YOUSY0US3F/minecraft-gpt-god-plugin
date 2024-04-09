@@ -378,7 +378,7 @@ public class GptActions {
 
     public static void processResponse(String response) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject == null)
+        if (responseObject.getChoices() == null)
             return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
@@ -389,7 +389,7 @@ public class GptActions {
 
     public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject == null)
+        if (responseObject.getChoices() == null)
             return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
