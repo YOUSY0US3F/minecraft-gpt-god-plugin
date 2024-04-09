@@ -48,7 +48,7 @@ public class GptActions {
     private int tokens = -1;
     private static Gson gson = new Gson();
 
-    private static void whisper(String playerName, String message) {
+    private static void staticWhisper(String playerName, String message) {
         Player player = GPTGOD.SERVER.getPlayerExact(playerName);
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
         player.sendMessage(message);
@@ -56,7 +56,7 @@ public class GptActions {
                 String.format("whispered \"%s\" to %s", message, playerName)));
     }
 
-    private static void announce(String message) {
+    private static void staticAnnounce(String message) {
         GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW)
                 .decoration(TextDecoration.BOLD, true));
         GPTGOD.SERVER.broadcast(Component.text(message, NamedTextColor.LIGHT_PURPLE)
@@ -69,12 +69,28 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String message = argsMap.get("message");
-        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null && !argsMap.get("playerName").isBlank()) {
-            whisper(argsMap.get("playerName"), message);
+        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null
+                && !argsMap.get("playerName").isBlank()) {
+            staticWhisper(argsMap.get("playerName"), message);
             return;
         } else {
-            announce(message);
+            staticAnnounce(message);
         }
+    };
+    private static Function<String> whisper = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String message = argsMap.get("message");
+        staticWhisper(argsMap.get("playerName"), message);
+        return;
+    };
+    private static Function<String> announce = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String message = argsMap.get("message");
+        staticAnnounce(message);
     };
     private static Function<String> giveItem = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -102,7 +118,7 @@ public class GptActions {
         String playerName = gson.fromJson(argObject.get("playerName"), String.class);
         int power = gson.fromJson(argObject.get("power"), Integer.class);
         Player player = GPTGOD.SERVER.getPlayer(playerName);
-        for(int i = 0 ; i<power ; i++){
+        for (int i = 0; i < power; i++) {
             WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
         }
         EventLogger.addLoggable(new GPTActionLoggable(String.format("smited %s", playerName)));
@@ -214,12 +230,15 @@ public class GptActions {
         EventLogger.addLoggable(new GPTActionLoggable(String.format("detonated Structure: %s", structure)));
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
-            Map.entry("sendMessage", new GptFunction("sendMessage",
-                    "send a message, you can specify a player to privately send a message or you can omit the player to brodcast to the whole server. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
-                    Map.of("playerName", new Parameter("string", "(optional) name of the player to privately send to"),
+            Map.entry("whisper", new GptFunction("whisper",
+                    "privately send a message to a player. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
+                    Map.of("playerName", new Parameter("string", "name of the player to privately send to"),
                             "message", new Parameter("string", "the message")),
-                    sendMessage)),
-
+                    whisper)),
+            Map.entry("announce", new GptFunction("announce",
+                    "brodcast a message to all players. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
+                    Map.of("message", new Parameter("string", "the message")),
+                    announce)),
             Map.entry("giveItem", new GptFunction("giveItem", "give a player any amount of an item",
                     Map.of("playerName", new Parameter("string", "name of the Player"),
                             "itemId", new Parameter("string", "the name of the minecraft item"),
@@ -231,7 +250,8 @@ public class GptActions {
                     command)),
             Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",
                     Map.of("playerName", new Parameter("string", "the player's name"),
-                        "power", new Parameter("number", "the strength of this smiting")), smite)),
+                            "power", new Parameter("number", "the strength of this smiting")),
+                    smite)),
             Map.entry("transformStructure",
                     new GptFunction("transformStructure", "replace all the blocks in a structure with any block",
                             Map.of("structure", new Parameter("string", "name of the structure"),
@@ -279,7 +299,7 @@ public class GptActions {
     private static GptTool[] tools;
     private static GptTool[] actionTools;
     private static GptTool[] speechTools;
-    private static final List<String> speechActionKeys = Arrays.asList("sendMessage");
+    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper");
 
     public static GptTool[] wrapFunctions(Map<String, GptFunction> functions) {
         GptFunction[] funcList = functions.values().toArray(new GptFunction[functions.size()]);
@@ -319,11 +339,16 @@ public class GptActions {
     }
 
     private static void dispatch(String command, CommandSender console) {
-        command = command.charAt(0) == '/'? command.substring(1) : command;
+        // can't let GPT turn off mob spawning
+        if(command.contains("doMobSpawning")){
+            return;
+        }
+        command = command.charAt(0) == '/' ? command.substring(1) : command;
         if (command.matches(".*\\bgive\\b.*") || command.contains(" in ")) {
             GPTGOD.SERVER.dispatchCommand(console, command);
         } else {
-            if(!(command.contains(" as ") || command.contains(" at ")) && (command.contains("~") || command.contains("^"))){
+            if (!(command.contains(" as ") || command.contains(" at "))
+                    && (command.contains("~") || command.contains("^"))) {
                 command = "execute at @r run " + command;
             }
             GPTGOD.SERVER.dispatchCommand(console,
@@ -353,7 +378,8 @@ public class GptActions {
 
     public static void processResponse(String response) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if(responseObject == null) return;
+        if (responseObject.getChoices() == null)
+            return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 run(call.getFunction().getName(), call.getFunction().getArguments());
@@ -363,7 +389,8 @@ public class GptActions {
 
     public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if(responseObject == null) return;
+        if (responseObject.getChoices() == null)
+            return;
         for (Choice choice : responseObject.getChoices()) {
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {

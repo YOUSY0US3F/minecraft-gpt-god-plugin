@@ -35,8 +35,9 @@ public class SummarizeLogs {
     .addContext("""
     You are a helpful assistant that will recieve a log of events from a minecraft server, \
     or a summary and a log of events. \
-    You will create a short summary based on this information that preserves the plot. \
+    You will create a short summary based on this information that preserves the plot detailed by both. \
     If information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts.
+    These logs are the history of the server so keep everything in the past tense.
     """, "prompt").setToolChoice(new GptFunctionReference(functionMap.get("submitSummary")));
 
     public static void summarize(String log, String summary){

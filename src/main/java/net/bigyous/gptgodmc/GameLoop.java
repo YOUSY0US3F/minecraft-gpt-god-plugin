@@ -23,8 +23,8 @@ public class GameLoop {
     private static int taskId;
     public static boolean isRunning = false;
     private static String PROMPT;
-    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. %s";
-    private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. %s";
+    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. Use the server history as a reference to note the change in player behavior%s";
+    private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. Only react to events listed under Current, Use the server history as a reference to note the change in player behavior %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
     private static String personality; 
     // converts seconds into ticks
@@ -34,7 +34,7 @@ public class GameLoop {
     public static void init(){
         if(isRunning || !config.getBoolean("enabled")) return;
         Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
-        Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools()).setToolChoice(new GptFunctionReference("sendMessage"));
+        Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools());
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimer(plugin, new GPTTask(), seconds(30), seconds(40));
         taskId = task.getTaskId();
         if(config.contains("prompt") && !config.getString("prompt").isBlank()){
@@ -76,7 +76,7 @@ public class GameLoop {
     }
 
     private static void sendSpeechActions(){
-        Speech_GPT_API.addContext(String.format(SPEECH_PROMPT_TEPLATE, PROMPT, getPreviousActions(), personality), "prompt");
+        Speech_GPT_API.addContext(String.format(SPEECH_PROMPT_TEPLATE, PROMPT, getPreviousActions(), personality), "prompt", 0);
         Speech_GPT_API.send();
     }
 
@@ -99,8 +99,8 @@ public class GameLoop {
                 nonLogTokens += GPTUtils.calculateToolTokens(actionTools);
                 EventLogger.cull(Action_GPT_API.getMaxTokens() - nonLogTokens);
                 String log = EventLogger.dump();
-                Action_GPT_API.addLogs(log, "log");
-                Speech_GPT_API.addLogs(log, "log");
+                Action_GPT_API.addLogs("Current: " + log, "log");
+                Speech_GPT_API.addLogs("Current: " +  log, "log");
                 previousActions = new ArrayList<>();
                 Action_GPT_API.send();
                 while(Action_GPT_API.isSending()){
