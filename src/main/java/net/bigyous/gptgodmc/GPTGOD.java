@@ -2,31 +2,42 @@ package net.bigyous.gptgodmc;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.annotation.Nullable;
+
+import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.bigyous.gptgodmc.utils.DebugCommand;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentBuilder;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.title.Title;
 
 public final class GPTGOD extends JavaPlugin {
 
     public static final String PLUGIN_ID = "example_plugin";
     public static final Logger LOGGER = LogManager.getLogger(PLUGIN_ID);
     public static Server SERVER;
+    public static GptGameMode gameMode;
+    public static Scoreboard SCOREBOARD;
+    public static Team RED_TEAM;
+    public static Team BLUE_TEAM;
 
     @Nullable
     private VoiceMonitorPlugin voicechatPlugin;
@@ -60,10 +71,25 @@ public final class GPTGOD extends JavaPlugin {
             }
 
         }
+        gameMode = GptGameMode.valueOf(getConfig().getString("gamemode"));
         SERVER.getPluginManager().registerEvents(new LoggableEventHandler(), this);
         SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
         SERVER.getPluginManager().registerEvents(new StructureManager(), this);
 
+        if(gameMode.equals(GptGameMode.DEATHMATCH)){
+            ScoreboardManager manager = Bukkit.getScoreboardManager();
+            SCOREBOARD = manager.getNewScoreboard();
+            RED_TEAM = SCOREBOARD.registerNewTeam("Red");
+            BLUE_TEAM = SCOREBOARD.registerNewTeam("Blue");
+            RED_TEAM.color(NamedTextColor.RED);
+            BLUE_TEAM.color(NamedTextColor.BLUE);
+            Component redDisplay = Component.text("Red Team").color(NamedTextColor.RED);
+            Component blueDisplay = Component.text("Blue Team").color(NamedTextColor.BLUE)
+            RED_TEAM.suffix(redDisplay);
+            BLUE_TEAM.suffix(blueDisplay);
+            RED_TEAM.displayName(redDisplay);
+            BLUE_TEAM.displayName(blueDisplay);
+        }
     }
 
     @Override
@@ -79,11 +105,15 @@ public final class GPTGOD extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
             GameLoop.init();
+            if(gameMode.equals(GptGameMode.DEATHMATCH)){
+                GameLoop.addPlayerToTeam(event.getPlayer());
+            }
 
         }
 
         @EventHandler
         public void onPlayerDisconnect(PlayerQuitEvent event) {
+            GameLoop.removePlayerFromTeam(event.getPlayer());
             GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
         }
 

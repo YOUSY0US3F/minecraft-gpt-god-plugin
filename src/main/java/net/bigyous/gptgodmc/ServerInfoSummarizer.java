@@ -13,6 +13,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class ServerInfoSummarizer {
@@ -71,7 +72,7 @@ public class ServerInfoSummarizer {
             return "Minor";
         } else if (enemies.size() < 10 && bosses.size() < 1) {
             return "Moderate";
-        } else if (enemies.size() < 17 || bosses.size() <= 1) {
+        } else if (enemies.size() < 17 || bosses.size() == 1) {
             return "High";
         }
         return "Crtitical";
@@ -125,6 +126,9 @@ public class ServerInfoSummarizer {
             String inventoryInfo = getInventoryInfo(player);
 
             sb.append("Status of Player " + name + ":\n");
+            if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+                sb.append(String.format("Team: %s", GPTGOD.SCOREBOARD.getEntityTeam(player)));
+            }
             sb.append("Health: " + health + '\n');
             if (!isDead) {
                 sb.append(StructureManager.getClosestStructureToLocation(player.getLocation()));

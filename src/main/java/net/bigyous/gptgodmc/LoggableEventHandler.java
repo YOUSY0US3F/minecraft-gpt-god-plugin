@@ -13,6 +13,7 @@ import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.InventoryBlockStartEvent;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -34,6 +35,7 @@ import net.bigyous.gptgodmc.loggables.RenameEntityEvent;
 import net.bigyous.gptgodmc.loggables.RenameItemLoggable;
 import net.bigyous.gptgodmc.loggables.ShootLoggable;
 import net.bigyous.gptgodmc.loggables.SleepTogetherLoggable;
+import net.bigyous.gptgodmc.loggables.SmeltLoggable;
 import net.bigyous.gptgodmc.loggables.SpecialBlockPlaceEventLoggable;
 import net.bigyous.gptgodmc.loggables.TameAnimalLoggable;
 import net.bigyous.gptgodmc.loggables.UseLoggable;
@@ -192,5 +194,10 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onKill(EntityDeathEvent event){
         EventLogger.addLoggable(new KillLoggable(event));
+    }
+
+    @EventHandler
+    public static void onCook(InventoryBlockStartEvent event){
+        EventLogger.addLoggable(new SmeltLoggable(event));
     }
 }
