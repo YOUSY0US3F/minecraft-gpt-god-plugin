@@ -1,6 +1,8 @@
 package net.bigyous.gptgodmc;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -15,13 +17,15 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.title.Title;
 public class RoundSystem implements Listener {
-    FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
+    JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
+    FileConfiguration config = plugin.getConfig();
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event){
         if(!config.getBoolean("Rounds") || config.getString("startingWorld").isBlank()) return;
         Player player = event.getPlayer();
         Server server = player.getServer();
         player.setGameMode(GameMode.SPECTATOR);
+        Bukkit.getScheduler().runTask(plugin, () -> player.getLocation().getBlock().setType(Material.SKELETON_SKULL));
 
         if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
             long living_red =  GPTGOD.RED_TEAM.getEntries().stream().filter((String name) -> server.getPlayer(name) != null && !server.getPlayer(name).getGameMode().equals(GameMode.SPECTATOR)).count();
