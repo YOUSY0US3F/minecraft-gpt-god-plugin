@@ -84,7 +84,7 @@ public final class GPTGOD extends JavaPlugin {
             RED_TEAM.color(NamedTextColor.RED);
             BLUE_TEAM.color(NamedTextColor.BLUE);
             Component redDisplay = Component.text("Red Team").color(NamedTextColor.RED);
-            Component blueDisplay = Component.text("Blue Team").color(NamedTextColor.BLUE)
+            Component blueDisplay = Component.text("Blue Team").color(NamedTextColor.BLUE);
             RED_TEAM.suffix(redDisplay);
             BLUE_TEAM.suffix(blueDisplay);
             RED_TEAM.displayName(redDisplay);

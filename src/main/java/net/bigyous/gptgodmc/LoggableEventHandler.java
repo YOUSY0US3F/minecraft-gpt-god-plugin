@@ -2,11 +2,12 @@ package net.bigyous.gptgodmc;
 
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityEnterLoveModeEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.event.entity.EntityTameEvent;
-import org.bukkit.event.entity.EntityCombustByEntityEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerAttemptPickupItemEvent;
@@ -45,6 +46,7 @@ import net.bigyous.gptgodmc.loggables.FishingLoggable;
 import net.bigyous.gptgodmc.loggables.DropItemLoggable;
 import net.bigyous.gptgodmc.loggables.DeathLoggable;
 import net.bigyous.gptgodmc.loggables.EatingLoggable;
+import net.bigyous.gptgodmc.loggables.EntityLoveLoggable;
 import net.bigyous.gptgodmc.loggables.ExplosionLoggable;
 import net.bigyous.gptgodmc.loggables.ChatLoggable;
 import net.bigyous.gptgodmc.loggables.CombustLoggable;
@@ -152,7 +154,7 @@ public class LoggableEventHandler implements Listener {
     }
 
     @EventHandler
-    public static void onCombust(EntityCombustByEntityEvent event){
+    public static void onCombust(EntityCombustEvent event){
         EventLogger.addLoggable(new CombustLoggable(event));
     }
 
@@ -199,5 +201,10 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onCook(InventoryBlockStartEvent event){
         EventLogger.addLoggable(new SmeltLoggable(event));
+    }
+
+    @EventHandler
+    public static void onBreed(EntityEnterLoveModeEvent event){
+        EventLogger.addLoggable(new EntityLoveLoggable(event));
     }
 }
