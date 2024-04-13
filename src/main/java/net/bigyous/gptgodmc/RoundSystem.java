@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -67,7 +68,7 @@ public class RoundSystem implements Listener {
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
             if(title != null) {
                 server.showTitle(title);
-                Bukkit.getScheduler().runTaskLater(plugin, () -> reset(), 5);
+                Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
                 return;
             }
         }
