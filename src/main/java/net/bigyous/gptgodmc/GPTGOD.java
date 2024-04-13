@@ -105,15 +105,12 @@ public final class GPTGOD extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
             GameLoop.init();
-            if(gameMode.equals(GptGameMode.DEATHMATCH)){
-                GameLoop.addPlayerToTeam(event.getPlayer());
-            }
+
 
         }
 
         @EventHandler
         public void onPlayerDisconnect(PlayerQuitEvent event) {
-            GameLoop.removePlayerFromTeam(event.getPlayer());
             GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
         }
 

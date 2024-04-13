@@ -33,17 +33,7 @@ public class GameLoop {
     private static long seconds(long seconds){
         return seconds * 20;
     }
-    public static void addPlayerToTeam(Player player){
-        if(GPTGOD.RED_TEAM.getSize() < GPTGOD.BLUE_TEAM.getSize()){
-            GPTGOD.RED_TEAM.addPlayer(player);
-        }
-        else{
-            GPTGOD.BLUE_TEAM.addPlayer(player);
-        }
-    }
-    public static void removePlayerFromTeam(Player player){
-        GPTGOD.SCOREBOARD.getPlayerTeam(player).removePlayer(player);
-    }
+
     public static void init(){
         if(isRunning || !config.getBoolean("enabled")) return;
         Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());

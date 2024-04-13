@@ -127,7 +127,7 @@ public class ServerInfoSummarizer {
 
             sb.append("Status of Player " + name + ":\n");
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
-                sb.append(String.format("Team: %s", GPTGOD.SCOREBOARD.getEntityTeam(player)));
+                sb.append(String.format("Team: %s\n", GPTGOD.SCOREBOARD.getEntityTeam(player).getName()));
             }
             sb.append("Health: " + health + '\n');
             if (!isDead) {
