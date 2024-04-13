@@ -5,12 +5,9 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Skull;
-import org.bukkit.block.data.Rotatable;
-import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -102,7 +99,7 @@ public class RoundSystem implements Listener {
         WorldManager.resetCurrentMap();
         StructureManager.reset();
         EventLogger.reset();
-        List<Player> reorderedPlayers = List.copyOf(GPTGOD.SERVER.getOnlinePlayers());
+        List<Player> reorderedPlayers = GPTGOD.SERVER.getOnlinePlayers().stream().map(player -> {return (Player) player;}).toList();
         Collections.shuffle(reorderedPlayers);
         GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
         GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
