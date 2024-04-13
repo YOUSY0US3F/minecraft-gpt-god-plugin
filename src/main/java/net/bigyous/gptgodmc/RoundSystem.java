@@ -100,7 +100,7 @@ public class RoundSystem implements Listener {
         WorldManager.resetCurrentMap();
         StructureManager.reset();
         EventLogger.reset();
-        List<Player> reorderedPlayers = new ArrayList<>(GPTGOD.SERVER.getOnlinePlayers());
+        List<Player> reorderedPlayers = new ArrayList<Player>(GPTGOD.SERVER.getOnlinePlayers());
         Collections.shuffle(reorderedPlayers);
         GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
         GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
