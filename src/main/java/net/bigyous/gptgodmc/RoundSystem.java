@@ -60,7 +60,7 @@ public class RoundSystem implements Listener {
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
             if(title != null) {
                 server.showTitle(title);
-                reset();
+                Bukkit.getScheduler().runTaskLater(plugin, () -> reset(), 5);
                 return;
             }
         }
