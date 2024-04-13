@@ -10,6 +10,7 @@ public class ShootLoggable extends BaseLoggable {
     private String shooter;
     private String target;
     private boolean isValid;
+    private String projectile;
     @SuppressWarnings("null")
     public ShootLoggable(EntityShootBowEvent event){
         
@@ -17,6 +18,7 @@ public class ShootLoggable extends BaseLoggable {
         if(isValid){
             LivingEntity ent = event.getEntity();
             shooter = ent.getName();
+            this.projectile = event.getProjectile().getName();
             Entity targetEnt = Targeter.getTarget(ent);
             isValid = targetEnt != null;
             this.target = isValid? targetEnt.getName() : null;
@@ -27,6 +29,6 @@ public class ShootLoggable extends BaseLoggable {
     @Override
     public String getLog() {
         if(!isValid) return null;
-        return String.format("%s shot an arrow at %s", shooter, target);
+        return String.format("%s launched a(n) %s at %s", shooter, projectile, target);
     }
 }

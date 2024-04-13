@@ -202,7 +202,7 @@ public class GptActions {
         if (player.getGameMode().equals(GameMode.SURVIVAL)) {
             return;
         }
-        Location spawn = player.getLastDeathLocation() != null ? player.getLastDeathLocation()
+        Location spawn = player.getRespawnLocation() != null ? player.getRespawnLocation()
                 : WorldManager.getCurrentWorld().getSpawnLocation();
         player.teleport(spawn);
         player.setGameMode(GameMode.SURVIVAL);

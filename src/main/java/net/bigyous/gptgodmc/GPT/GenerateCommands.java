@@ -9,6 +9,7 @@ import net.bigyous.gptgodmc.GPT.Json.GptFunction;
 import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.GPT.Json.Parameter;
+import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.bigyous.gptgodmc.interfaces.Function;
 
 import java.util.Arrays;
@@ -45,6 +46,13 @@ public class GenerateCommands {
             return String.format("%s: (%s)", key,
                     StructureManager.getStructure(key).getLocation().toVector().toString());
         }).toArray());
+
+        String teams = String.join(",",GPTGOD.SCOREBOARD.getTeams().stream().map(team -> {
+                return team.getName();
+        }).toList());
+        if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+                gpt.addContext(String.format("Teams: %s", teams), "teams");
+        }
         gpt.addContext(
                 String.format("Players: %s",
                         Arrays.toString(

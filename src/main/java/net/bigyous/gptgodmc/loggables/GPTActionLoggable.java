@@ -6,7 +6,7 @@ public class GPTActionLoggable extends BaseLoggable {
     private String text;
 
     public GPTActionLoggable(String text){
-        this.text = "You " + text;
+        this.text = "God " + text;
         GameLoop.logAction(text);
     }
 

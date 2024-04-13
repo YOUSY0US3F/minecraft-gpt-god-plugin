@@ -1,6 +1,7 @@
 package net.bigyous.gptgodmc;
 
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -8,6 +9,7 @@ import net.bigyous.gptgodmc.GPT.GPTModels;
 import net.bigyous.gptgodmc.GPT.GptAPI;
 import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.GPT.Personality;
+import net.bigyous.gptgodmc.GPT.Prompts;
 import net.bigyous.gptgodmc.GPT.Json.GptFunctionReference;
 import net.bigyous.gptgodmc.GPT.Json.GptTool;
 import net.bigyous.gptgodmc.utils.GPTUtils;
@@ -31,24 +33,20 @@ public class GameLoop {
     private static long seconds(long seconds){
         return seconds * 20;
     }
+
     public static void init(){
         if(isRunning || !config.getBoolean("enabled")) return;
         Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
         Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools());
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimer(plugin, new GPTTask(), seconds(30), seconds(40));
         taskId = task.getTaskId();
-        if(config.contains("prompt") && !config.getString("prompt").isBlank()){
-            personality = Personality.generatePersonality();
-            PROMPT= config.getString("prompt");
-            String actionPrompt = String.format(ACTION_PROMPT_TEMPLATE, PROMPT, personality);
-            Action_GPT_API.addContext(actionPrompt, "prompt");
-            
-            // the roles system and user are each one token so we add two to this number
-            staticTokens = GPTUtils.countTokens(actionPrompt) + 2;
-        }
-        else{
-            GPTGOD.LOGGER.error("no prompt set in config file, the plugin wont work as intended!");
-        }
+        personality = Personality.generatePersonality();
+        PROMPT= Prompts.getGamemodePrompt(GPTGOD.gameMode);
+        String actionPrompt = String.format(ACTION_PROMPT_TEMPLATE, PROMPT, personality);
+        Action_GPT_API.addContext(actionPrompt, "prompt");
+        
+        // the roles system and user are each one token so we add two to this number
+        staticTokens = GPTUtils.countTokens(actionPrompt) + 2;
         isRunning = true;
         GPTGOD.LOGGER.info("GameLoop Started, the minecraft god has awoken");
     }
