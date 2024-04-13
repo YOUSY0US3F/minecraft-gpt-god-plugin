@@ -1,5 +1,6 @@
 package net.bigyous.gptgodmc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -99,7 +100,7 @@ public class RoundSystem implements Listener {
         WorldManager.resetCurrentMap();
         StructureManager.reset();
         EventLogger.reset();
-        List<Player> reorderedPlayers = GPTGOD.SERVER.getOnlinePlayers().stream().map(player -> {return (Player) player;}).toList();
+        List<Player> reorderedPlayers = new ArrayList<>(GPTGOD.SERVER.getOnlinePlayers());
         Collections.shuffle(reorderedPlayers);
         GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
         GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
