@@ -56,9 +56,6 @@ public class RoundSystem implements Listener {
         if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
             long living_red =  GPTGOD.RED_TEAM.getEntries().stream().filter((String name) -> (server.getPlayer(name) != null && !server.getPlayer(name).getGameMode().equals(GameMode.SPECTATOR))).count();
             long living_blue =  GPTGOD.BLUE_TEAM.getEntries().stream().filter((String name) -> (server.getPlayer(name) != null && !server.getPlayer(name).getGameMode().equals(GameMode.SPECTATOR))).count();
-            GPTGOD.LOGGER.info(living_blue);
-            GPTGOD.LOGGER.info(String.join(",", GPTGOD.BLUE_TEAM.getEntries()));
-            GPTGOD.LOGGER.info(String.join(",", GPTGOD.BLUE_TEAM.getEntries().stream().filter(name -> (server.getPlayer(name).getGameMode().equals(GameMode.SPECTATOR))).toList()));
             Title title = living_red < 1 ? Title.title(Component.text("BLUE WINS").color(NamedTextColor.BLUE), Component.text(String.format("%d players remaining", living_blue))): 
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
             if(title != null) {

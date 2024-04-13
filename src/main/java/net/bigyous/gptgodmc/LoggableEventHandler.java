@@ -71,9 +71,9 @@ public class LoggableEventHandler implements Listener {
 
         EventLogger.addLoggable(new ChatLoggable(event.getPlayer().getName(), ((TextComponent)event.message()).content()));
         // dbg: dump logs
-        GPTGOD.LOGGER.info("=== DUMPED LOGS: ===");
-        GPTGOD.LOGGER.info(EventLogger.debugOut());
-        GPTGOD.LOGGER.info("====================");
+        // GPTGOD.LOGGER.info("=== DUMPED LOGS: ===");
+        // GPTGOD.LOGGER.info(EventLogger.debugOut());
+        // GPTGOD.LOGGER.info("====================");
     }
 
     @EventHandler
