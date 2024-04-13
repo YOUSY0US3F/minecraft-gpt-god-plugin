@@ -8,6 +8,9 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.block.Skull;
+import org.bukkit.block.data.Rotatable;
+import org.bukkit.block.structure.StructureRotation;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -51,7 +54,11 @@ public class RoundSystem implements Listener {
         Player player = event.getPlayer();
         Server server = player.getServer();
         player.setGameMode(GameMode.SPECTATOR);
-        Bukkit.getScheduler().runTask(plugin, () -> player.getLocation().getBlock().setType(Material.SKELETON_SKULL));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            player.getLocation().getBlock().setType(Material.PLAYER_HEAD);
+            Skull playerSkull = (Skull) player.getLocation().getBlock().getState();
+            playerSkull.setOwningPlayer(player);
+        });
 
         if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
             long living_red =  GPTGOD.RED_TEAM.getEntries().stream().filter((String name) -> (server.getPlayer(name) != null && !server.getPlayer(name).getGameMode().equals(GameMode.SPECTATOR))).count();
