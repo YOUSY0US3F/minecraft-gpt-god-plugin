@@ -3,6 +3,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+
 import net.bigyous.gptgodmc.utils.CompareLoggables;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 import net.bigyous.gptgodmc.GPT.SummarizeLogs;
@@ -96,6 +99,8 @@ public class EventLogger {
         summary = null;
         SummarizeLogs.summarize(logs, tempSummary);
         generatingSummary = true;
+        //prevent infinite waiting, auto timeout after 2 seconds
+        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), () -> {generatingSummary = false;}, 40);
     }
 
     public static boolean isGeneratingSummary() {

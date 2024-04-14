@@ -185,7 +185,7 @@ public class GptAPI {
                 // after everything finishes, executing the request is finished
                 Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), () -> {
                     this.isSending = false;
-                }, 10);
+                }, 20);
             } catch (IOException e) {
                 GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
                 this.isSending = false;
