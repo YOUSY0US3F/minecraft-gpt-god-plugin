@@ -13,7 +13,6 @@ public class EventLogger {
     private static TreeSet<Loggable> loggables = new TreeSet<>(new CompareLoggables());
     private static int totalTokens = 0;
     private static String summary = null;
-    private static String overflow = "";
     private static boolean generatingSummary = false;
 
     public static void addLoggable(Loggable event) {
@@ -44,7 +43,6 @@ public class EventLogger {
         int serverInfoTokens = GPTUtils.countTokens(ServerInfoSummarizer.getStatusSummary());
         while(totalTokens + serverInfoTokens > tokenLimit){
             Loggable oldest = loggables.first();
-            overflow = overflow + "\n" + oldest;
             totalTokens -= oldest.getTokens();
             loggables.remove(oldest);
         }
@@ -96,9 +94,8 @@ public class EventLogger {
     private static void summarize(String logs){
         String tempSummary = summary;
         summary = null;
-        SummarizeLogs.summarize(overflow + "\n" + logs, tempSummary);
+        SummarizeLogs.summarize(logs, tempSummary);
         generatingSummary = true;
-        overflow = "";
     }
 
     public static boolean isGeneratingSummary() {
@@ -108,6 +105,5 @@ public class EventLogger {
     public static void reset(){
         loggables.clear();
         summary = null;
-        overflow = "";
     }
 }

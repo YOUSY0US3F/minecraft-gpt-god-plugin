@@ -30,6 +30,7 @@ public class RoundSystem implements Listener {
 
     private static Vector RED_SPAWN = new Vector(-1.499, 63, 1.713);
     private static Vector BLUE_SPAWN = new Vector(32, 63, 1.713);
+    private static boolean roundOver = false;
 
     public static void addPlayerToTeam(Player player){
         if(GPTGOD.RED_TEAM.getSize() < GPTGOD.BLUE_TEAM.getSize()){
@@ -66,9 +67,10 @@ public class RoundSystem implements Listener {
             Title title = living_red < 1 && living_blue < 1 ? Title.title(Component.text("NO ONE WINS").color(NamedTextColor.YELLOW), Component.text("Your death was is vain.").color(NamedTextColor.RED)) :
                 living_red < 1 ? Title.title(Component.text("BLUE WINS").color(NamedTextColor.BLUE), Component.text(String.format("%d players remaining", living_blue))): 
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
-            if(title != null) {
+            if(title != null && !roundOver) {
                 server.showTitle(title);
                 Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
+                roundOver = true;
                 return;
             }
         }
@@ -112,6 +114,7 @@ public class RoundSystem implements Listener {
             }   
         }
         GameLoop.init();
+        roundOver = false;
     }
 
     public static void revivePlayer(Player player){

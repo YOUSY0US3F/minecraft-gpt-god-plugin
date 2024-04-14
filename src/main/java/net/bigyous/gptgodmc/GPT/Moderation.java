@@ -40,11 +40,9 @@ public class Moderation {
                 HttpPost post = new HttpPost(MODERATION_URL);
                 post.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + auth);
                 post.setEntity(data);
-                GPTGOD.LOGGER.info("sending Moderation data to OpenAi: "+ payload);
                 HttpResponse response = client.execute(post);
                 String raw = new String(response.getEntity().getContent().readAllBytes());
                 EntityUtils.consume(response.getEntity());
-                GPTGOD.LOGGER.info("recieved response from OpenAI: " + raw);
                 if(response.getStatusLine().getStatusCode() != 200){
                     GPTGOD.LOGGER.warn("API call failed");
                     Thread.currentThread().interrupt();

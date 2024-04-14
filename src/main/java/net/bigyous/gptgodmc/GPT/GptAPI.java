@@ -3,6 +3,8 @@ package net.bigyous.gptgodmc.GPT;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService; 
+import java.util.concurrent.Executors; 
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -33,6 +35,7 @@ public class GptAPI {
     private String CHATGPTURL = "https://api.openai.com/v1/chat/completions";
     private Map<String, Integer> messageMap = new HashMap<String, Integer>();
     private boolean isSending = false;
+    private static ExecutorService pool = Executors.newCachedThreadPool();
 
     public GptAPI(GptModel model) {
         this.body = new GptRequest(model, GptActions.GetAllTools());
@@ -126,7 +129,7 @@ public class GptAPI {
 
     public void send() {
         CloseableHttpClient client = HttpClientBuilder.create().build();
-        Thread worker = new Thread(() -> {
+        pool.execute(() -> {
             this.isSending = true;
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data = new StringEntity(gson.create().toJson(body), ContentType.APPLICATION_JSON);
@@ -142,7 +145,6 @@ public class GptAPI {
                 GPTGOD.LOGGER.info("recieved response from OpenAI: " + out);
                 if (response.getStatusLine().getStatusCode() != 200) {
                     GPTGOD.LOGGER.warn("API call failed");
-                    Thread.currentThread().interrupt();
                     this.isSending = false;
                 }
                 GptActions.processResponse(out);
@@ -155,14 +157,12 @@ public class GptAPI {
                 GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
                 this.isSending = false;
             }
-            Thread.currentThread().interrupt();
         });
-        worker.start();
     }
 
     public void send(Map<String, GptFunction> functions) {
         CloseableHttpClient client = HttpClientBuilder.create().build();
-        Thread worker = new Thread(() -> {
+        pool.execute(() -> {
             this.isSending = true;
             FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
             StringEntity data = new StringEntity(gson.create().toJson(body), ContentType.APPLICATION_JSON);
@@ -178,7 +178,6 @@ public class GptAPI {
                 GPTGOD.LOGGER.info("recieved response from OpenAI: " + out);
                 if (response.getStatusLine().getStatusCode() != 200) {
                     GPTGOD.LOGGER.warn("API call failed");
-                    Thread.currentThread().interrupt();
                     this.isSending = false;
                 }
                 GptActions.processResponse(out, functions);
@@ -191,10 +190,7 @@ public class GptAPI {
                 GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
                 this.isSending = false;
             }
-
-            Thread.currentThread().interrupt();
         });
-        worker.start();
     }
 
     public boolean isSending() {
