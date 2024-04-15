@@ -5,6 +5,7 @@ import java.util.TreeSet;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import net.bigyous.gptgodmc.utils.CompareLoggables;
 import net.bigyous.gptgodmc.utils.GPTUtils;
@@ -17,6 +18,7 @@ public class EventLogger {
     private static int totalTokens = 0;
     private static String summary = null;
     private static boolean generatingSummary = false;
+    private static int summarizeTaskID = -1;
 
     public static void addLoggable(Loggable event) {
         if (loggables.size() > 0) {
@@ -92,6 +94,7 @@ public class EventLogger {
         GPTGOD.LOGGER.info("new summary: ", newSummary);
         summary = newSummary;
         generatingSummary = false;
+        Bukkit.getScheduler().cancelTask(summarizeTaskID);
     }
 
     private static void summarize(String logs){
@@ -100,7 +103,8 @@ public class EventLogger {
         SummarizeLogs.summarize(logs, tempSummary);
         generatingSummary = true;
         //prevent infinite waiting, auto timeout after 2 seconds
-        Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), () -> {generatingSummary = false;}, 40);
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), () -> {generatingSummary = false;}, 40);
+        summarizeTaskID = task.getTaskId();
     }
 
     public static boolean isGeneratingSummary() {

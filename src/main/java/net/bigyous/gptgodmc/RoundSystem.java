@@ -35,7 +35,7 @@ public class RoundSystem implements Listener {
     FileConfiguration config = plugin.getConfig();
 
     private static Vector RED_SPAWN = new Vector(-1.499, 63, 1.713);
-    private static Vector BLUE_SPAWN = new Vector(32, 63, 1.713);
+    private static Vector BLUE_SPAWN = new Vector(48, 63, 1.713);
     private static boolean roundOver = false;
 
     public static void addPlayerToTeam(Player player){

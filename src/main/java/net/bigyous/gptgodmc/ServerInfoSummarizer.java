@@ -50,9 +50,9 @@ public class ServerInfoSummarizer {
     private static String getStructures() {
         StringBuilder sb = new StringBuilder();
         for (String structure : StructureManager.getStructures()) {
-            sb.append(String.format("%s: builder: %s size: %d, ", structure,
-                    StructureManager.getStructure(structure).getBuilder().getName(), 
-                    StructureManager.getStructure(structure).getSize()));
+            sb.append(String.format("%s: size: %d builder: %s, ", structure,
+                StructureManager.getStructure(structure).getSize(),
+                    StructureManager.getStructure(structure).getBuilder().getName()));
         }
         return sb.toString();
     }
