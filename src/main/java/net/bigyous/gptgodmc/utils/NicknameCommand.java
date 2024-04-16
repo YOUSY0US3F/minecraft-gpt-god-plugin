@@ -8,6 +8,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+
 import java.util.UUID;
 
 public class NicknameCommand implements CommandExecutor {
@@ -21,6 +24,8 @@ public class NicknameCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
+
+        player.playerListName(player.name().append(Component.text(" - " + args[0]).color(NamedTextColor.YELLOW)));
 
         NICK_NAMES.put(player.getUniqueId(), args[0]);
 

@@ -4,14 +4,10 @@ import java.util.HashSet;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
 import net.bigyous.gptgodmc.StructureManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 public class SpecialBlockPlaceEventLoggable extends BaseLoggable {
     private HashSet<Material> specialBlocks = new HashSet<Material>(){{
