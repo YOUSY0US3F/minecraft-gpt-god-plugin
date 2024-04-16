@@ -10,5 +10,9 @@ depend: [ voicechat ]
 
 commands:
   try:
-    description: tests out a GPTFunction as if called by OpenAi for debug purposes
+    description: tests out a GPTFunction as if called by OpenAi for debug purposes, can only be used in the server console
     usage: /try [function name] [Json formatted args]
+  
+  nickname:
+    description: if you are reffered to by a name other than your username specify it here for GPT. edgy inputs will break the plugin
+    usage: /nickname [name]

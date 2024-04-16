@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import net.bigyous.gptgodmc.enums.GptGameMode;
+import net.bigyous.gptgodmc.utils.NicknameCommand;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
 public class ServerInfoSummarizer {
@@ -112,21 +113,28 @@ public class ServerInfoSummarizer {
                 world.isClearWeather() ? "Clear" : "Storm");
     }
 
+    private static String getObjectives() {
+        return GPTGOD.SCOREBOARD.getObjectives().isEmpty() ? "" :
+            String.format("Objectives: %s", String.join(",", GPTGOD.SCOREBOARD.getObjectives().stream().map((obj) -> obj.getName()).toList()));
+    }
+
     public static String getStatusSummary() {
         StringBuilder sb = new StringBuilder("Server Status:\n");
         sb.append(String.format("Time of day: %s\n", WorldManager.getCurrentWorld().isDayTime() ? "Day" : "Night"));
         sb.append(String.format("Weather: %s\n", getWeather()));
         sb.append("Structures: " + getStructures() + "\n");
+        sb.append(getObjectives());
         for (Player player : GPTGOD.SERVER.getOnlinePlayers()) {
             // player.getP
             String name = player.getName();
+            String nickname = NicknameCommand.getNickname(player);
             boolean isDead = player.isDead() || player.getGameMode().equals(GameMode.SPECTATOR);
             String health = isDead ? "Dead" : getPlayerHealth(player);
             boolean isSleeping = player.isSleeping();
             // player.getInventory()
             String inventoryInfo = getInventoryInfo(player);
-
             sb.append("Status of Player " + name + ":\n");
+            if (!nickname.isBlank()) sb.append("Nickname: " + nickname + "\n");
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
                 sb.append(String.format("Team: %s\n", GPTGOD.SCOREBOARD.getEntityTeam(player).getName()));
             }

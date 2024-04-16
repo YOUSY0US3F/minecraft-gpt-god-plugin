@@ -22,6 +22,7 @@ import javax.annotation.Nullable;
 
 import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.bigyous.gptgodmc.utils.DebugCommand;
+import net.bigyous.gptgodmc.utils.NicknameCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
@@ -59,6 +60,7 @@ public final class GPTGOD extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
         getCommand("try").setExecutor(new DebugCommand());
+        getCommand("nickname").setExecutor(new NicknameCommand());
         Path worlds = getDataFolder().toPath().resolve("worlds");
         if (getConfig().getString("startingWorld").isBlank() || !getConfig().getBoolean("Rounds")) {
             String message = getConfig().getBoolean("Rounds")
@@ -76,9 +78,10 @@ public final class GPTGOD extends JavaPlugin {
         SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
         SERVER.getPluginManager().registerEvents(new StructureManager(), this);
 
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        SCOREBOARD = manager.getNewScoreboard();
+
         if(gameMode.equals(GptGameMode.DEATHMATCH)){
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            SCOREBOARD = manager.getNewScoreboard();
             RED_TEAM = SCOREBOARD.registerNewTeam("Red");
             BLUE_TEAM = SCOREBOARD.registerNewTeam("Blue");
             RED_TEAM.color(NamedTextColor.RED);
@@ -105,7 +108,7 @@ public final class GPTGOD extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
             GameLoop.init();
-
+            event.getPlayer().setScoreboard(SCOREBOARD);
 
         }
 

@@ -49,6 +49,7 @@ public class RoundSystem implements Listener {
             player.setRespawnLocation(BLUE_SPAWN.toLocation(WorldManager.getCurrentWorld()), true);
             player.displayName(Component.text(player.getName()).color(NamedTextColor.BLUE));
         }
+        player.setScoreboard(GPTGOD.SCOREBOARD);
         player.teleport(player.getRespawnLocation());
     }
     public static void removePlayerFromTeam(Player player){
