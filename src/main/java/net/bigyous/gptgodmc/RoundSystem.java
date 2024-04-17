@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
+import org.bukkit.event.player.PlayerPortalEvent;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
@@ -49,7 +50,6 @@ public class RoundSystem implements Listener {
             player.setRespawnLocation(BLUE_SPAWN.toLocation(WorldManager.getCurrentWorld()), true);
             player.displayName(Component.text(player.getName()).color(NamedTextColor.BLUE));
         }
-        player.setScoreboard(GPTGOD.SCOREBOARD);
         player.teleport(player.getRespawnLocation());
     }
     public static void removePlayerFromTeam(Player player){
@@ -116,6 +116,13 @@ public class RoundSystem implements Listener {
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
         removePlayerFromTeam(event.getPlayer());
+    }
+    @EventHandler
+    public void onPortal(PlayerPortalEvent event){
+        if(!event.getTo().getWorld().getName().equals("world_nether")){
+            event.setTo(WorldManager.getCurrentWorld().getSpawnLocation());
+        }
+        
     }
 
     public static void reset(){
