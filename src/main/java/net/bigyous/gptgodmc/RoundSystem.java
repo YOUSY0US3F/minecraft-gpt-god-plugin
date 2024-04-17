@@ -83,7 +83,7 @@ public class RoundSystem implements Listener {
         }
 
        for(Player p : server.getOnlinePlayers()){
-            if(!p.getGameMode().equals(GameMode.SPECTATOR)){
+            if(p.getGameMode().equals(GameMode.SURVIVAL)){
                 return;
             }
        }
