@@ -7,9 +7,10 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.destroystokyo.paper.MaterialSetTag;
 
 public class PlantLoggable extends BaseLoggable {
-    private String plant;
-    private String player;
-    private boolean isValid = false;
+    protected String plant;
+    protected String player;
+    protected boolean isValid = false;
+    protected int count = 1;
 
     public PlantLoggable (BlockPlaceEvent event){
         if(event.getBlock().getBlockData() instanceof Sapling || event.getBlock().getBlockData() instanceof Ageable || MaterialSetTag.FLOWERS.isTagged(event.getBlock().getType())){
@@ -25,6 +26,20 @@ public class PlantLoggable extends BaseLoggable {
         if (!isValid){
             return null;
         }
-        return String.format("%s planted a %s", player, plant);
+        String quantifier = count > 1? String.valueOf(count) : "a";
+        return String.format("%s planted %s %s", player, quantifier, plant);
+    }
+
+    @Override
+    public boolean combine(Loggable l) {
+        if(!(l instanceof PlantLoggable)) return false;
+        PlantLoggable other = (PlantLoggable) l;
+        if(!other.isValid || !this.isValid) return false;
+
+        if (other.plant.equals(this.plant) && other.player.equals(this.player)){
+            this.count += other.count;
+            return true;
+        }
+        return false;
     }
 }

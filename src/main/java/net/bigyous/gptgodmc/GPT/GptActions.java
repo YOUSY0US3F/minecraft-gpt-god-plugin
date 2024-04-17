@@ -228,7 +228,7 @@ public class GptActions {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        String objective = argsMap.get(argsMap.get("objective"));
+        String objective = argsMap.get("objective");
         if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
             GPTGOD.SCOREBOARD.getObjective(objective).unregister();
             EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
@@ -243,7 +243,7 @@ public class GptActions {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
-        String objective = argsMap.get(argsMap.get("objective"));
+        String objective = argsMap.get("objective");
         if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
             GPTGOD.SCOREBOARD.getObjective(objective).unregister();
             EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
@@ -415,9 +415,10 @@ public class GptActions {
 
     public static void processResponse(String response) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject.getChoices() == null)
-            return;
         for (Choice choice : responseObject.getChoices()) {
+            if(choice.getMessage().getTool_calls() == null){
+                continue;
+            }
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 run(call.getFunction().getName(), call.getFunction().getArguments());
             }
@@ -426,9 +427,10 @@ public class GptActions {
 
     public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject.getChoices() == null)
-            return;
         for (Choice choice : responseObject.getChoices()) {
+            if(choice.getMessage().getTool_calls() == null){
+                continue;
+            }
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
                     functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());
