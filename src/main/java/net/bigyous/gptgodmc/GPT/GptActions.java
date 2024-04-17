@@ -360,10 +360,9 @@ public class GptActions {
             actionTools = wrapFunctions(actionFunctionMap);
         }
         GptTool[] newTools = GPTUtils.randomToolSubset(actionTools, 3);
+        GptTool[] persistentTools = persistentActionKeys.stream().map(key -> {return new GptTool(functionMap.get(key));}).toArray(GptTool[]::new);
         // I could do this nicer, but I don't feel like it
-        newTools[3] = new GptTool(functionMap.get("command"));
-        newTools[4] = new GptTool(functionMap.get("setObjective"));
-        newTools[5] = new GptTool(functionMap.get("clearObjective"));
+        newTools = GPTUtils.concatWithArrayCopy(newTools, persistentTools);
         return newTools;
     }
 

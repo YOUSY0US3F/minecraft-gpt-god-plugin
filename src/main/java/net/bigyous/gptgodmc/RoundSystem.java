@@ -115,7 +115,10 @@ public class RoundSystem implements Listener {
     }
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
-        removePlayerFromTeam(event.getPlayer());
+        if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+            removePlayerFromTeam(event.getPlayer());
+        }
+        
     }
     @EventHandler
     public void onPortal(PlayerPortalEvent event){
