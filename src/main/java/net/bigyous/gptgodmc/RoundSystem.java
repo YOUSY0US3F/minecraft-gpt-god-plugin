@@ -76,7 +76,7 @@ public class RoundSystem implements Listener {
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
             if(title != null && !roundOver) {
                 server.showTitle(title);
-                Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
+                // Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
                 roundOver = true;
                 return;
             }

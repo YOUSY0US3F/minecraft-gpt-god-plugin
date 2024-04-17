@@ -229,7 +229,7 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get(argsMap.get("objective"));
-        if(GPTGOD.SCOREBOARD.getObjective(objective) == null){
+        if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
             GPTGOD.SCOREBOARD.getObjective(objective).unregister();
             EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
             return;
@@ -244,7 +244,7 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get(argsMap.get("objective"));
-        if(GPTGOD.SCOREBOARD.getObjective(objective) == null){
+        if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
             GPTGOD.SCOREBOARD.getObjective(objective).unregister();
             EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
             return;
@@ -333,8 +333,8 @@ public class GptActions {
     private static GptTool[] tools;
     private static GptTool[] actionTools;
     private static GptTool[] speechTools;
-    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper");
-    private static final List<String> persistentActionKeys = Arrays.asList("setObjective", "clearObjective", "command");
+    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper", "setObjective", "clearObjective");
+    private static final List<String> persistentActionKeys = Arrays.asList("command");
 
     public static GptTool[] wrapFunctions(Map<String, GptFunction> functions) {
         GptFunction[] funcList = functions.values().toArray(new GptFunction[functions.size()]);
