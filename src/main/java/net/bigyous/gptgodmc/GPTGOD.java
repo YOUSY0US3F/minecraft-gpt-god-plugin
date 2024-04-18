@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -39,6 +40,7 @@ public final class GPTGOD extends JavaPlugin {
     public static Scoreboard SCOREBOARD;
     public static Team RED_TEAM;
     public static Team BLUE_TEAM;
+    public static Objective GPT_OBJECTIVES;
 
     @Nullable
     private VoiceMonitorPlugin voicechatPlugin;
@@ -80,7 +82,7 @@ public final class GPTGOD extends JavaPlugin {
 
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         SCOREBOARD = manager.getNewScoreboard();
-
+        GPT_OBJECTIVES = SCOREBOARD.registerNewObjective("gpt", Criteria.DUMMY, Component.text("Holy Objectives:").color(NamedTextColor.YELLOW));
         if(gameMode.equals(GptGameMode.DEATHMATCH)){
             RED_TEAM = SCOREBOARD.registerNewTeam("Red");
             BLUE_TEAM = SCOREBOARD.registerNewTeam("Blue");

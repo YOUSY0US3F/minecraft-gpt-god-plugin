@@ -115,7 +115,7 @@ public class ServerInfoSummarizer {
 
     private static String getObjectives() {
         return GPTGOD.SCOREBOARD.getObjectives().isEmpty() ? "" :
-            String.format("Objectives: %s", String.join(",", GPTGOD.SCOREBOARD.getObjectives().stream().map((obj) -> obj.getName()).toList()));
+            String.format("Objectives: %s", String.join(",", GPTGOD.SCOREBOARD.getEntries().stream().filter(entry -> GPTGOD.SERVER.getPlayer(entry)==null).toList()));
     }
 
     public static String getStatusSummary() {

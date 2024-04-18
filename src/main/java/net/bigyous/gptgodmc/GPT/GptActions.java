@@ -229,13 +229,8 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get("objective");
-        if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
-            GPTGOD.SCOREBOARD.getObjective(objective).unregister();
-            EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
-            return;
-        }
-        Objective obj = GPTGOD.SCOREBOARD.registerNewObjective(objective, Criteria.DUMMY, Component.text(objective));
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
+        GPTGOD.GPT_OBJECTIVES.getScore(objective).setScore(0);
+        if (GPTGOD.GPT_OBJECTIVES.getDisplaySlot() == null) GPTGOD.GPT_OBJECTIVES.setDisplaySlot(DisplaySlot.SIDEBAR);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("set objective %s", objective)));
         
     };
@@ -244,11 +239,8 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get("objective");
-        if(GPTGOD.SCOREBOARD.getObjective(objective) != null){
-            GPTGOD.SCOREBOARD.getObjective(objective).unregister();
-            EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
-            return;
-        }
+        GPTGOD.GPT_OBJECTIVES.getScore(objective).resetScore();
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
         
     };
     private static Function<String> detonateStructure = (String args) -> {
