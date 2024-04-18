@@ -123,7 +123,7 @@ public class ServerInfoSummarizer {
         sb.append(String.format("Time of day: %s\n", WorldManager.getCurrentWorld().isDayTime() ? "Day" : "Night"));
         sb.append(String.format("Weather: %s\n", getWeather()));
         sb.append("Structures: " + getStructures() + "\n");
-        sb.append(getObjectives());
+        sb.append(getObjectives() + "\n");
         for (Player player : GPTGOD.SERVER.getOnlinePlayers()) {
             // player.getP
             String name = player.getName();

@@ -240,6 +240,9 @@ public class GptActions {
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get("objective");
         GPTGOD.GPT_OBJECTIVES.getScore(objective).resetScore();
+        if(GPTGOD.SCOREBOARD.getEntries().stream().filter(entry -> GPTGOD.SERVER.getPlayer(entry) == null).count() < 1){
+            GPTGOD.GPT_OBJECTIVES.setDisplaySlot(null);
+        }
         EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
         
     };
