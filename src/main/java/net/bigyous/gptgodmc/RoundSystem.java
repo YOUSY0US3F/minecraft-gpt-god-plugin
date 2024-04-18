@@ -21,6 +21,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.util.Vector;
 import org.bukkit.event.player.PlayerPortalEvent;
 
@@ -137,6 +138,7 @@ public class RoundSystem implements Listener {
         Collections.shuffle(reorderedPlayers);
         GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
         GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        GPTGOD.SCOREBOARD.clearSlot(DisplaySlot.SIDEBAR);
         for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
             revivePlayer(p);
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
