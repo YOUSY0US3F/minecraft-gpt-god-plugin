@@ -5,19 +5,27 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.block.Skull;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.util.Vector;
+import org.bukkit.event.player.PlayerPortalEvent;
+
+import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
 import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.enums.GptGameMode;
@@ -29,7 +37,8 @@ public class RoundSystem implements Listener {
     FileConfiguration config = plugin.getConfig();
 
     private static Vector RED_SPAWN = new Vector(-1.499, 63, 1.713);
-    private static Vector BLUE_SPAWN = new Vector(32, 63, 1.713);
+    private static Vector BLUE_SPAWN = new Vector(48, 63, 1.713);
+    private static boolean roundOver = false;
 
     public static void addPlayerToTeam(Player player){
         if(GPTGOD.RED_TEAM.getSize() < GPTGOD.BLUE_TEAM.getSize()){
@@ -66,15 +75,16 @@ public class RoundSystem implements Listener {
             Title title = living_red < 1 && living_blue < 1 ? Title.title(Component.text("NO ONE WINS").color(NamedTextColor.YELLOW), Component.text("Your death was is vain.").color(NamedTextColor.RED)) :
                 living_red < 1 ? Title.title(Component.text("BLUE WINS").color(NamedTextColor.BLUE), Component.text(String.format("%d players remaining", living_blue))): 
                 living_blue < 1 ? Title.title(Component.text("RED WINS").color(NamedTextColor.RED), Component.text(String.format("%d players remaining", living_red))) : null;
-            if(title != null) {
+            if(title != null && !roundOver) {
                 server.showTitle(title);
-                Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
+                // Bukkit.getScheduler().runTaskLater(plugin, () ->{ GptActions.executeCommand("kill @e"); reset();}, 5);
+                roundOver = true;
                 return;
             }
         }
 
        for(Player p : server.getOnlinePlayers()){
-            if(!p.getGameMode().equals(GameMode.SPECTATOR)){
+            if(p.getGameMode().equals(GameMode.SURVIVAL)){
                 return;
             }
        }
@@ -91,9 +101,32 @@ public class RoundSystem implements Listener {
             addPlayerToTeam(event.getPlayer());
         }   
     }
+
+    @EventHandler
+    public void onPlayerSpawn(PlayerPostRespawnEvent event){
+        if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+            Player player = event.getPlayer();
+            ItemStack helm = new ItemStack(Material.LEATHER_HELMET);
+            LeatherArmorMeta helmMeta = (LeatherArmorMeta) helm.getItemMeta();
+            helmMeta.setColor(GPTGOD.SCOREBOARD.getEntityTeam(player).getName().equals("Red")? Color.RED : Color.BLUE);
+            helm.setItemMeta(helmMeta);
+            player.getInventory().setHelmet(helm);
+            player.getInventory().getHelmet().addEnchantment(Enchantment.BINDING_CURSE, 1);
+        }
+    }
     @EventHandler
     public void onPlayerDisconnect(PlayerQuitEvent event) {
-        removePlayerFromTeam(event.getPlayer());
+        if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+            removePlayerFromTeam(event.getPlayer());
+        }
+        
+    }
+    @EventHandler
+    public void onPortal(PlayerPortalEvent event){
+        if(!event.getTo().getWorld().getName().equals("world_nether")){
+            event.setTo(WorldManager.getCurrentWorld().getSpawnLocation());
+        }
+        
     }
 
     public static void reset(){
@@ -105,6 +138,7 @@ public class RoundSystem implements Listener {
         Collections.shuffle(reorderedPlayers);
         GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
         GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        GPTGOD.SCOREBOARD.clearSlot(DisplaySlot.SIDEBAR);
         for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
             revivePlayer(p);
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
@@ -112,6 +146,7 @@ public class RoundSystem implements Listener {
             }   
         }
         GameLoop.init();
+        roundOver = false;
     }
 
     public static void revivePlayer(Player player){

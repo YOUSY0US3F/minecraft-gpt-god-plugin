@@ -7,10 +7,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
 public class AttackLoggable extends BaseLoggable {
-    private String attackerName;
-    private String targetName;
-    private Boolean isValid = false;
-    private String weapon = "";
+    protected String attackerName;
+    protected String targetName;
+    protected Boolean isValid = false;
+    protected String weapon = "";
 
     public AttackLoggable(EntityDamageByEntityEvent event) {
         this.attackerName = event.getDamager().getName();
@@ -32,7 +32,12 @@ public class AttackLoggable extends BaseLoggable {
 
     @Override
     public boolean combine(Loggable other) {
-        // Combine logic if needed
-        return false;
+        if(!(other instanceof AttackLoggable)){
+            return false;
+        }
+
+        AttackLoggable loggable = (AttackLoggable) other;
+        if(!this.isValid || !loggable.isValid) return false;
+        return loggable.attackerName.equals(this.attackerName) && loggable.targetName.equals(this.targetName) && loggable.weapon.equals(this.weapon);
     }
 }

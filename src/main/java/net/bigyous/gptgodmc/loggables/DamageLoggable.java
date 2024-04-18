@@ -1,30 +1,30 @@
 package net.bigyous.gptgodmc.loggables;
 
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Projectile;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import net.bigyous.gptgodmc.GPTGOD;
 
 public class DamageLoggable extends BaseLoggable {
-    private String entityName;
-    private double damageAmount;
-    private String damageSource;
-    private boolean isValid;
+    protected String entityName;
+    protected double damageAmount;
+    protected String damageSource;
+    protected boolean isValid;
 
     public DamageLoggable(EntityDamageEvent event) {
         this.entityName = event.getEntity().getName();
         this.damageAmount = event.getDamage();
-        if(event.getDamageSource().getDirectEntity() != null){
+        this.isValid = !event.getCause().equals(DamageCause.ENTITY_ATTACK) && !event.getCause().equals(DamageCause.ENTITY_SWEEP_ATTACK) && event.getEntityType().equals(EntityType.PLAYER);
+        if(event.getCause().equals(DamageCause.PROJECTILE)){
             this.damageSource = event.getDamageSource().getDirectEntity().getName();
             if(event.getDamageSource().getDirectEntity() instanceof Projectile){
                 Projectile projectile = (Projectile) event.getDamageSource().getDirectEntity();
                 damageSource = projectile.getOwnerUniqueId() != null? GPTGOD.SERVER.getEntity(projectile.getOwnerUniqueId()).getName(): damageSource;
             }
-            this.isValid = true;
         }
-        else{
-            this.isValid = false;
-        }
+        damageSource = event.getCause().toString();
         
     }
 
@@ -38,7 +38,14 @@ public class DamageLoggable extends BaseLoggable {
 
     @Override
     public boolean combine(Loggable other) {
-        // Combine logic if needed
+        if(!(other instanceof DamageLoggable)) return false;
+
+        DamageLoggable loggable = (DamageLoggable) other;
+
+        if(loggable.entityName.equals(this.entityName) && loggable.damageSource.equals(this.damageSource)){
+            this.damageAmount += loggable.damageAmount;
+            return true;
+        }
         return false;
     }
 }

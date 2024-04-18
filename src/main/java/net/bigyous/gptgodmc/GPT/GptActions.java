@@ -19,6 +19,9 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
 
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
@@ -221,6 +224,28 @@ public class GptActions {
         player.teleport(destination);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("teleported %s to %s", playerName, destName)));
     };
+    private static Function<String> setObjective = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String objective = argsMap.get("objective");
+        GPTGOD.GPT_OBJECTIVES.getScore(objective).setScore(0);
+        if (GPTGOD.GPT_OBJECTIVES.getDisplaySlot() == null) GPTGOD.GPT_OBJECTIVES.setDisplaySlot(DisplaySlot.SIDEBAR);
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("set objective %s", objective)));
+        
+    };
+    private static Function<String> clearObjective = (String args) -> {
+        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
+        };
+        Map<String, String> argsMap = gson.fromJson(args, mapType);
+        String objective = argsMap.get("objective");
+        GPTGOD.GPT_OBJECTIVES.getScore(objective).resetScore();
+        if(GPTGOD.SCOREBOARD.getEntries().stream().filter(entry -> GPTGOD.SERVER.getPlayer(entry) == null).count() < 1){
+            GPTGOD.GPT_OBJECTIVES.setDisplaySlot(null);
+        }
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
+        
+    };
     private static Function<String> detonateStructure = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
         String structure = gson.fromJson(argObject.get("structure"), String.class);
@@ -248,7 +273,7 @@ public class GptActions {
                     "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
                     Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
                     command)),
-            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning",
+            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning, reserve this punishment for repeat offenders",
                     Map.of("playerName", new Parameter("string", "the player's name"),
                             "power", new Parameter("number", "the strength of this smiting")),
                     smite)),
@@ -287,6 +312,10 @@ public class GptActions {
                             new Parameter("string",
                                     "The name of the player or Structure the player will be sent to")),
                     teleport)),
+            Map.entry("setObjective", new GptFunction("setObjective", "set an objective for players to complete. base this off of the behaviors observed in the logs", 
+            Map.of("objective", new Parameter("string", "the objective to set")), setObjective)),
+            Map.entry("clearObjective", new GptFunction("clearObjective", "set an objective as complete. Follow this up with a reward", 
+            Map.of("objective", new Parameter("string", "the objective to mark as complete")), clearObjective)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
                     Map.of("structure", new Parameter("string", "name of the structure"),
                             "setFire", new Parameter("boolean", "will this explosion cause fires?"),
@@ -299,7 +328,8 @@ public class GptActions {
     private static GptTool[] tools;
     private static GptTool[] actionTools;
     private static GptTool[] speechTools;
-    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper");
+    private static final List<String> speechActionKeys = Arrays.asList("announce", "whisper", "setObjective", "clearObjective");
+    private static final List<String> persistentActionKeys = Arrays.asList("command");
 
     public static GptTool[] wrapFunctions(Map<String, GptFunction> functions) {
         GptFunction[] funcList = functions.values().toArray(new GptFunction[functions.size()]);
@@ -321,11 +351,13 @@ public class GptActions {
     public static GptTool[] GetActionTools() {
         if (actionTools == null || actionTools[0] == null) {
             actionFunctionMap.keySet().removeAll(speechActionKeys);
-            actionFunctionMap.keySet().remove("command");
+            actionFunctionMap.keySet().removeAll(persistentActionKeys);
             actionTools = wrapFunctions(actionFunctionMap);
         }
-        GptTool[] newTools = GPTUtils.randomToolSubset(actionTools, 4);
-        newTools[newTools.length - 1] = new GptTool(functionMap.get("command"));
+        GptTool[] newTools = GPTUtils.randomToolSubset(actionTools, 3);
+        GptTool[] persistentTools = persistentActionKeys.stream().map(key -> {return new GptTool(functionMap.get(key));}).toArray(GptTool[]::new);
+        // I could do this nicer, but I don't feel like it
+        newTools = GPTUtils.concatWithArrayCopy(newTools, persistentTools);
         return newTools;
     }
 
@@ -378,9 +410,10 @@ public class GptActions {
 
     public static void processResponse(String response) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject.getChoices() == null)
-            return;
         for (Choice choice : responseObject.getChoices()) {
+            if(choice.getMessage().getTool_calls() == null){
+                continue;
+            }
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 run(call.getFunction().getName(), call.getFunction().getArguments());
             }
@@ -389,9 +422,10 @@ public class GptActions {
 
     public static void processResponse(String response, Map<String, GptFunction> functions) {
         GptResponse responseObject = gson.fromJson(response, GptResponse.class);
-        if (responseObject.getChoices() == null)
-            return;
         for (Choice choice : responseObject.getChoices()) {
+            if(choice.getMessage().getTool_calls() == null){
+                continue;
+            }
             for (ToolCall call : choice.getMessage().getTool_calls()) {
                 Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
                     functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());

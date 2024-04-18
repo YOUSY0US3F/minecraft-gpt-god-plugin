@@ -32,6 +32,7 @@ import net.bigyous.gptgodmc.loggables.DamageLoggable;
 import net.bigyous.gptgodmc.loggables.ItemPickupLoggable;
 import net.bigyous.gptgodmc.loggables.KillLoggable;
 import net.bigyous.gptgodmc.loggables.MountLoggable;
+import net.bigyous.gptgodmc.loggables.PlantLoggable;
 import net.bigyous.gptgodmc.loggables.RenameEntityEvent;
 import net.bigyous.gptgodmc.loggables.RenameItemLoggable;
 import net.bigyous.gptgodmc.loggables.ShootLoggable;
@@ -206,5 +207,10 @@ public class LoggableEventHandler implements Listener {
     @EventHandler
     public static void onBreed(EntityEnterLoveModeEvent event){
         EventLogger.addLoggable(new EntityLoveLoggable(event));
+    }
+
+    @EventHandler
+    public static void onPlant(BlockPlaceEvent event){
+        EventLogger.addLoggable(new PlantLoggable(event));
     }
 }

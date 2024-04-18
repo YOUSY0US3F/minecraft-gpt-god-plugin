@@ -3,6 +3,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
+
 import net.bigyous.gptgodmc.utils.CompareLoggables;
 import net.bigyous.gptgodmc.utils.GPTUtils;
 import net.bigyous.gptgodmc.GPT.SummarizeLogs;
@@ -13,8 +17,8 @@ public class EventLogger {
     private static TreeSet<Loggable> loggables = new TreeSet<>(new CompareLoggables());
     private static int totalTokens = 0;
     private static String summary = null;
-    private static String overflow = "";
     private static boolean generatingSummary = false;
+    private static int summarizeTaskID = -1;
 
     public static void addLoggable(Loggable event) {
         if (loggables.size() > 0) {
@@ -44,7 +48,6 @@ public class EventLogger {
         int serverInfoTokens = GPTUtils.countTokens(ServerInfoSummarizer.getStatusSummary());
         while(totalTokens + serverInfoTokens > tokenLimit){
             Loggable oldest = loggables.first();
-            overflow = overflow + "\n" + oldest;
             totalTokens -= oldest.getTokens();
             loggables.remove(oldest);
         }
@@ -91,14 +94,17 @@ public class EventLogger {
         GPTGOD.LOGGER.info("new summary: ", newSummary);
         summary = newSummary;
         generatingSummary = false;
+        Bukkit.getScheduler().cancelTask(summarizeTaskID);
     }
 
     private static void summarize(String logs){
         String tempSummary = summary;
         summary = null;
-        SummarizeLogs.summarize(overflow + "\n" + logs, tempSummary);
+        SummarizeLogs.summarize(logs, tempSummary);
         generatingSummary = true;
-        overflow = "";
+        //prevent infinite waiting, auto timeout after 2 seconds
+        BukkitTask task = Bukkit.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), () -> {generatingSummary = false;}, 40);
+        summarizeTaskID = task.getTaskId();
     }
 
     public static boolean isGeneratingSummary() {
@@ -108,6 +114,5 @@ public class EventLogger {
     public static void reset(){
         loggables.clear();
         summary = null;
-        overflow = "";
     }
 }

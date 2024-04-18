@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
+import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -22,6 +23,7 @@ import javax.annotation.Nullable;
 
 import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.bigyous.gptgodmc.utils.DebugCommand;
+import net.bigyous.gptgodmc.utils.NicknameCommand;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentBuilder;
 import net.kyori.adventure.text.TextComponent;
@@ -38,6 +40,7 @@ public final class GPTGOD extends JavaPlugin {
     public static Scoreboard SCOREBOARD;
     public static Team RED_TEAM;
     public static Team BLUE_TEAM;
+    public static Objective GPT_OBJECTIVES;
 
     @Nullable
     private VoiceMonitorPlugin voicechatPlugin;
@@ -59,6 +62,7 @@ public final class GPTGOD extends JavaPlugin {
         getConfig().options().copyDefaults(true);
         saveConfig();
         getCommand("try").setExecutor(new DebugCommand());
+        getCommand("nickname").setExecutor(new NicknameCommand());
         Path worlds = getDataFolder().toPath().resolve("worlds");
         if (getConfig().getString("startingWorld").isBlank() || !getConfig().getBoolean("Rounds")) {
             String message = getConfig().getBoolean("Rounds")
@@ -76,17 +80,18 @@ public final class GPTGOD extends JavaPlugin {
         SERVER.getPluginManager().registerEvents(new StartGameLoop(), this);
         SERVER.getPluginManager().registerEvents(new StructureManager(), this);
 
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        SCOREBOARD = manager.getNewScoreboard();
+        GPT_OBJECTIVES = SCOREBOARD.registerNewObjective("gpt", Criteria.DUMMY, Component.text("Holy Objectives:").color(NamedTextColor.YELLOW));
         if(gameMode.equals(GptGameMode.DEATHMATCH)){
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            SCOREBOARD = manager.getNewScoreboard();
             RED_TEAM = SCOREBOARD.registerNewTeam("Red");
             BLUE_TEAM = SCOREBOARD.registerNewTeam("Blue");
             RED_TEAM.color(NamedTextColor.RED);
             BLUE_TEAM.color(NamedTextColor.BLUE);
             Component redDisplay = Component.text("Red Team").color(NamedTextColor.RED);
             Component blueDisplay = Component.text("Blue Team").color(NamedTextColor.BLUE);
-            RED_TEAM.suffix(redDisplay);
-            BLUE_TEAM.suffix(blueDisplay);
+            RED_TEAM.prefix(redDisplay);
+            BLUE_TEAM.prefix(blueDisplay);
             RED_TEAM.displayName(redDisplay);
             BLUE_TEAM.displayName(blueDisplay);
         }
@@ -105,7 +110,7 @@ public final class GPTGOD extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
             GameLoop.init();
-
+            event.getPlayer().setScoreboard(SCOREBOARD);
 
         }
 

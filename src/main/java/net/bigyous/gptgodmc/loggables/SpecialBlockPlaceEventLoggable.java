@@ -1,17 +1,17 @@
 package net.bigyous.gptgodmc.loggables;
 
 import java.util.HashSet;
+import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
-import org.bukkit.block.Sign;
-import org.bukkit.block.sign.Side;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
 
+import com.destroystokyo.paper.MaterialSetTag;
+
 import net.bigyous.gptgodmc.StructureManager;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent;
 
 public class SpecialBlockPlaceEventLoggable extends BaseLoggable {
     private HashSet<Material> specialBlocks = new HashSet<Material>(){{
@@ -19,33 +19,27 @@ public class SpecialBlockPlaceEventLoggable extends BaseLoggable {
         add(Material.LAVA);
         add(Material.WATER);
         add(Material.JUKEBOX);
-        add(Material.OAK_SIGN);
-        add(Material.BIRCH_SIGN);
-        add(Material.SPRUCE_SIGN);
-        add(Material.ACACIA_SIGN);
-        add(Material.BAMBOO_SIGN);
-        add(Material.CHERRY_SIGN);
-        add(Material.JUNGLE_SIGN);
-        add(Material.WARPED_SIGN);
-        add(Material.CRIMSON_SIGN);
-        add(Material.OAK_WALL_SIGN);
-        add(Material.BIRCH_WALL_SIGN);
-        add(Material.SPRUCE_WALL_SIGN);
-        add(Material.ACACIA_WALL_SIGN);
-        add(Material.BAMBOO_WALL_SIGN);
-        add(Material.CHERRY_WALL_SIGN);
-        add(Material.JUNGLE_WALL_SIGN);
-        add(Material.WARPED_WALL_SIGN);
-        add(Material.CRIMSON_WALL_SIGN);
+        add(Material.CRAFTING_TABLE);
+        add(Material.FURNACE);
+        add(Material.BLAST_FURNACE);
+        add(Material.CAMPFIRE);
+        add(Material.SOUL_CAMPFIRE);
+        add(Material.ANVIL);
+        add(Material.CAKE);
+        add(Material.ENCHANTING_TABLE);
+        add(Material.ARMOR_STAND);
+        add(Material.CHEST);
     }};
+
+    private List<Tag<Material>> specialGroups = List.of(MaterialSetTag.ALL_SIGNS, MaterialSetTag.DOORS, MaterialSetTag.BEDS, MaterialSetTag.CANDLES, MaterialSetTag.ITEMS_BOATS);
     protected Block block;
     protected Player player;
     private String blockName;
     private String location;
-    private int quantity = 1;
+    protected int quantity = 1;
     private boolean isValid = false;
     public SpecialBlockPlaceEventLoggable(BlockPlaceEvent event){
-        if(specialBlocks.contains(event.getBlock().getType())){
+        if(specialBlocks.contains(event.getBlock().getType()) || isInSpecialGroup(event.getBlock().getType())){
             this.player = event.getPlayer();
             this.block = event.getBlock();
             this.blockName = block.getType().toString();
@@ -78,11 +72,23 @@ public class SpecialBlockPlaceEventLoggable extends BaseLoggable {
         return String.format("%s placed %s %s %s", player.getName(), getQuantity(), blockName, location);
     }
 
+    private Boolean isInSpecialGroup(Material mat){
+        for(Tag<Material> group : specialGroups){
+            if(group.isTagged(mat)){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean combine(Loggable l) {
         if(!(l instanceof SpecialBlockPlaceEventLoggable) || !isValid) return false;
 
         SpecialBlockPlaceEventLoggable loggable = (SpecialBlockPlaceEventLoggable) l;
+        if (loggable.block.getType().equals(block.getType()) && loggable.player.getName().equals(player.getName())){
+            this.quantity += loggable.quantity;
+        }
         return loggable.block.getType().equals(block.getType()) && loggable.player.getName().equals(player.getName());
     }
 }
