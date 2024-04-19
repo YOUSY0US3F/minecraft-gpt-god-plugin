@@ -20,7 +20,7 @@ public class AttackLoggable extends BaseLoggable {
         if(event.getDamager() instanceof Player){
             Player player = (Player) event.getDamager();
             ItemStack stack = player.getInventory().getItemInMainHand();
-            this.weapon = !stack.isEmpty() || stack !=null || stack.getType().equals(Material.AIR) ? " with a(n) " + stack.getType().toString() : " barehanded";
+            this.weapon = !stack.isEmpty() || stack !=null || !stack.getType().equals(Material.AIR) ? " with a(n) " + stack.getType().toString() : " barehanded";
         }
     }
 
