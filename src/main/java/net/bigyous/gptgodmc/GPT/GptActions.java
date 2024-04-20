@@ -66,20 +66,8 @@ public class GptActions {
                 .decoration(TextDecoration.BOLD, true));
         EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", message)));
     }
+    // in hindsight, I should have used an interface or abstract class to do this but oh well...
 
-    private static Function<String> sendMessage = (String args) -> {
-        TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
-        };
-        Map<String, String> argsMap = gson.fromJson(args, mapType);
-        String message = argsMap.get("message");
-        if (argsMap.containsKey("playerName") && argsMap.get("playerName") != null
-                && !argsMap.get("playerName").isBlank()) {
-            staticWhisper(argsMap.get("playerName"), message);
-            return;
-        } else {
-            staticAnnounce(message);
-        }
-    };
     private static Function<String> whisper = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
         };
@@ -229,7 +217,8 @@ public class GptActions {
         };
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get("objective");
-        GPTGOD.GPT_OBJECTIVES.getScore(objective).setScore(0);
+
+        GPTGOD.GPT_OBJECTIVES.getScore(objective.length() > 45 ? objective.substring(0, 44) : objective ).setScore(0);
         if (GPTGOD.GPT_OBJECTIVES.getDisplaySlot() == null) GPTGOD.GPT_OBJECTIVES.setDisplaySlot(DisplaySlot.SIDEBAR);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("set objective %s", objective)));
         
@@ -312,7 +301,7 @@ public class GptActions {
                             new Parameter("string",
                                     "The name of the player or Structure the player will be sent to")),
                     teleport)),
-            Map.entry("setObjective", new GptFunction("setObjective", "set an objective for players to complete. base this off of the behaviors observed in the logs", 
+            Map.entry("setObjective", new GptFunction("setObjective", "set an objective for players to complete. base this off of the behaviors observed in the logs. objectives can't be longer than 45 characters", 
             Map.of("objective", new Parameter("string", "the objective to set")), setObjective)),
             Map.entry("clearObjective", new GptFunction("clearObjective", "set an objective as complete. Follow this up with a reward", 
             Map.of("objective", new Parameter("string", "the objective to mark as complete")), clearObjective)),
