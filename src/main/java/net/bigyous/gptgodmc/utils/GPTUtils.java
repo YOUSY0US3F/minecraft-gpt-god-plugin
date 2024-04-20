@@ -46,4 +46,6 @@ public class GPTUtils {
         System.arraycopy(array2, 0, result, array1.length, array2.length);
         return result;
     }
+
+    public static extract 
 }
