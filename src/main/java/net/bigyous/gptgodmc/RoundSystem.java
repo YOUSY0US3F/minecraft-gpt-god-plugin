@@ -136,10 +136,12 @@ public class RoundSystem implements Listener {
         EventLogger.reset();
         List<Player> reorderedPlayers = new ArrayList<Player>(GPTGOD.SERVER.getOnlinePlayers());
         Collections.shuffle(reorderedPlayers);
-        GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
-        GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+            GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
+            GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        }
         GPTGOD.SCOREBOARD.clearSlot(DisplaySlot.SIDEBAR);
-        for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
+        for(Player p : reorderedPlayers){
             revivePlayer(p);
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
                 addPlayerToTeam(p);
