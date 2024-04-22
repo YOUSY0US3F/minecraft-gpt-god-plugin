@@ -20,6 +20,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Score;
+
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.StructureManager;
@@ -33,6 +35,7 @@ import net.bigyous.gptgodmc.GPT.Json.ToolCall;
 import net.bigyous.gptgodmc.interfaces.Function;
 import net.bigyous.gptgodmc.loggables.GPTActionLoggable;
 import net.bigyous.gptgodmc.utils.GPTUtils;
+import net.bigyous.gptgodmc.utils.GptObjectiveTracker;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -47,6 +50,7 @@ import com.google.gson.reflect.TypeToken;
 public class GptActions {
     private int tokens = -1;
     private static Gson gson = new Gson();
+    private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
 
     private static void staticWhisper(String playerName, String message) {
         Player player = GPTGOD.SERVER.getPlayerExact(playerName);
@@ -215,7 +219,11 @@ public class GptActions {
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         String objective = argsMap.get("objective");
 
-        GPTGOD.GPT_OBJECTIVES.getScore(objective.length() > 45 ? objective.substring(0, 44) : objective ).setScore(0);
+        Score score = GPTGOD.GPT_OBJECTIVES.getScore(objective.length() > 45 ? objective.substring(0, 44) : objective );
+        score.setScore(plugin.getConfig().getInt("objectiveDecay"));
+        // decrement the score by one every minute until the score reaches zero
+        GptObjectiveTracker tracker = new GptObjectiveTracker(score);
+        tracker.setTaskId(Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, tracker, 0, 1200));
         if (GPTGOD.GPT_OBJECTIVES.getDisplaySlot() == null) GPTGOD.GPT_OBJECTIVES.setDisplaySlot(DisplaySlot.SIDEBAR);
         EventLogger.addLoggable(new GPTActionLoggable(String.format("set objective %s", objective)));
         
@@ -388,7 +396,7 @@ public class GptActions {
 
     public static int run(String functionName, String jsonArgs) {
         GPTGOD.LOGGER.info(String.format("running function \"%s\" with json arguments \"%s\"", functionName, jsonArgs));
-        Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+        Bukkit.getScheduler().runTask(plugin, () -> {
             functionMap.get(functionName).runFunction(jsonArgs);
         });
         return 1;
@@ -413,7 +421,7 @@ public class GptActions {
                 continue;
             }
             for (ToolCall call : choice.getMessage().getTool_calls()) {
-                Bukkit.getScheduler().runTask(JavaPlugin.getPlugin(GPTGOD.class), () -> {
+                Bukkit.getScheduler().runTask(plugin, () -> {
                     functions.get(call.getFunction().getName()).runFunction(call.getFunction().getArguments());
                 });
             }

@@ -33,3 +33,8 @@ enabled: true
 # this is case sensitive
 #[SANDBOX, DEATHMATCH]
 gamemode: SANDBOX
+
+
+# How long the objectives given by GPT last
+# (in minutes)
+objectiveDecay: 6
