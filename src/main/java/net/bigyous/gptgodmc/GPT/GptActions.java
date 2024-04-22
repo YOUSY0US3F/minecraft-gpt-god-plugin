@@ -19,10 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.Criteria;
 import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-
 import net.bigyous.gptgodmc.EventLogger;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.StructureManager;

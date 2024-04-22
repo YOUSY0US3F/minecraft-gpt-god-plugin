@@ -36,7 +36,8 @@ public class UseLoggable extends BaseLoggable{
         Material.NETHERITE_HOE,
         Material.NETHERITE_AXE,
         Material.NETHERITE_SHOVEL,
-        Material.BONE_MEAL
+        Material.BONE_MEAL,
+        Material.FIREWORK_ROCKET
         );
     
     public UseLoggable(PlayerInteractEvent event){

@@ -87,13 +87,14 @@ public class WorldManager {
         if(!hasWorldLoaded()) return;
         player.setRespawnLocation(currentGameMap.getWorld().getSpawnLocation(), true);
         player.teleport(currentGameMap.getWorld().getSpawnLocation());
-        player.getInventory().clear();
-        player.updateInventory();
-        player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-        player.clearActiveItem();
-        player.clearActivePotionEffects();
-        player.setLevel(0);
-        
+        if(!player.isDead()){
+            player.getInventory().clear();
+            player.updateInventory();
+            player.setHealth(player.getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
+            player.clearActiveItem();
+            player.clearActivePotionEffects();
+            player.setLevel(0);
+        }        
     }
 
     public static String getDimensionName(){
