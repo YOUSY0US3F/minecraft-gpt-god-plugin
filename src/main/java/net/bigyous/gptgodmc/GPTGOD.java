@@ -8,7 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Criteria;
-import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -25,11 +24,7 @@ import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.bigyous.gptgodmc.utils.DebugCommand;
 import net.bigyous.gptgodmc.utils.NicknameCommand;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.ComponentBuilder;
-import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.title.Title;
 
 public final class GPTGOD extends JavaPlugin {
 

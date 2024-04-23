@@ -27,7 +27,6 @@ import org.bukkit.event.player.PlayerPortalEvent;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 
-import net.bigyous.gptgodmc.GPT.GptActions;
 import net.bigyous.gptgodmc.enums.GptGameMode;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -136,10 +135,16 @@ public class RoundSystem implements Listener {
         EventLogger.reset();
         List<Player> reorderedPlayers = new ArrayList<Player>(GPTGOD.SERVER.getOnlinePlayers());
         Collections.shuffle(reorderedPlayers);
-        GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
-        GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        if (GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
+            GPTGOD.RED_TEAM.removeEntries(GPTGOD.RED_TEAM.getEntries());
+            GPTGOD.BLUE_TEAM.removeEntries(GPTGOD.BLUE_TEAM.getEntries());
+        }
         GPTGOD.SCOREBOARD.clearSlot(DisplaySlot.SIDEBAR);
-        for(Player p : GPTGOD.SERVER.getOnlinePlayers()){
+        GPTGOD.SCOREBOARD.getEntries().forEach(entry -> {
+            GPTGOD.GPT_OBJECTIVES.getScore(entry).resetScore();
+        });
+        
+        for(Player p : reorderedPlayers){
             revivePlayer(p);
             if(GPTGOD.gameMode.equals(GptGameMode.DEATHMATCH)){
                 addPlayerToTeam(p);
