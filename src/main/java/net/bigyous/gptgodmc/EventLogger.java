@@ -113,6 +113,7 @@ public class EventLogger {
 
     public static void reset(){
         loggables.clear();
+        totalTokens = 0;
         summary = null;
     }
 }
