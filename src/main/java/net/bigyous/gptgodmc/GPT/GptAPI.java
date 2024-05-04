@@ -96,6 +96,10 @@ public class GptAPI {
     }
 
     public GptAPI addLogs(String Logs, String name, int index) {
+        if(this.body.getMessagesSize() <= index){
+            addLogs(Logs, name);
+            return this;
+        }
         if (this.messageMap.containsKey(name)) {
             this.body.replaceMessage(messageMap.get(name), Logs);
             return this;

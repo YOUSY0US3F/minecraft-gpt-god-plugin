@@ -79,6 +79,9 @@ public class GameLoop {
     private static void sendSpeechActions() {
         Speech_GPT_API.addContext(String.format(SPEECH_PROMPT_TEPLATE, PROMPT, getPreviousActions(), personality),
                 "prompt", 0);
+        if(EventLogger.hasSummary()){
+            Speech_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
+        }
         Speech_GPT_API.send();
     }
 
@@ -92,7 +95,6 @@ public class GameLoop {
             int nonLogTokens = staticTokens;
             if (EventLogger.hasSummary()) {
                 Action_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
-                Speech_GPT_API.addLogs("Server History: " + EventLogger.getSummary(), "summary", 1);
                 nonLogTokens += GPTUtils.countTokens(EventLogger.getSummary()) + 1;
             }
             GptTool[] actionTools = GptActions.GetActionTools();
