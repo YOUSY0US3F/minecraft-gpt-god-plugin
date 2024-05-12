@@ -7,10 +7,18 @@ public class SleepTogetherLoggable extends BaseLoggable {
     private String partners;
     private String playerName;
     private boolean isValid;
+
+    private boolean isInBed(Player player){
+        try {
+            return player.getBedLocation() != null;
+        }catch(IllegalStateException e) {
+            return false;
+        }
+    }
     public SleepTogetherLoggable(PlayerBedEnterEvent event){
         this.isValid = event.getBedEnterResult().equals(BedEnterResult.OK);
         StringBuilder sb = new StringBuilder();
-        event.getBed().getLocation().getNearbyPlayers(1, 1, player -> (player.isSleeping())).stream().forEach((Player player) -> sb.append(player.getName() + ", ") );
+        event.getBed().getLocation().getNearbyPlayers(1, 1, player -> (isInBed(player))).stream().forEach((Player player) -> sb.append(player.getName() + ", ") );
         this.partners = sb.toString();
         this.playerName = event.getPlayer().getName();
     }
