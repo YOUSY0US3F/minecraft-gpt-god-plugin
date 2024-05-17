@@ -19,7 +19,7 @@ public class SummarizeLogs {
         You are a helpful assistant that will recieve a log of events from a minecraft server, \
         or a historical summary and a log of events. \
         You will create a short summary based on this information that preserves the plot detailed by both, you are viewing these logs from the perspective of a god that rewards %s and punishes %s \
-        If information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts, pay attention to actions that align with any objectives listed in the objectives.
+        Keep track of the reputation of each player, if information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts, pay attention to actions that align with any objectives listed in the objectives.
         These logs are the history of the server so keep everything in the past tense.
         """;
     private static Gson gson = new Gson();
