@@ -29,6 +29,9 @@ public class Moderation {
     private static String MODERATION_URL = "https://api.openai.com/v1/moderations";
     
     public static void moderateUserInput(String input, UserInputLoggable loggable){
+        if(input == null){
+            return;
+        }
         CloseableHttpClient client = HttpClientBuilder.create().build();
         Thread worker = new Thread(() -> {
             String auth = JavaPlugin.getPlugin(GPTGOD.class).getConfig().getString("openAiKey");
