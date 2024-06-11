@@ -119,6 +119,7 @@ public class StructureManager implements Listener {
     }
 
     public static String getClosestStructureToLocation(Location location){
+        if(!location.getWorld().getName().equals(WorldManager.getCurrentWorld().getName())) return "In a different dimension";
         if(getStructures().isEmpty()) return "";
         int distance = Integer.MAX_VALUE;
         String closest = "";
@@ -141,6 +142,7 @@ public class StructureManager implements Listener {
     }
 
     public static StructureProximityData getStructureProximityData(Location location){
+        if(!location.getWorld().getName().equals(WorldManager.getCurrentWorld().getName())) return null;
         if(getStructures().isEmpty()) return null;
         int distance = Integer.MAX_VALUE;
         String closest = "";
