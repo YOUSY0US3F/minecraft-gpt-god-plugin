@@ -28,7 +28,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 public final class GPTGOD extends JavaPlugin {
 
-    public static final String PLUGIN_ID = "example_plugin";
+    public static final String PLUGIN_ID = "gptgodmc";
     public static final Logger LOGGER = LogManager.getLogger(PLUGIN_ID);
     public static Server SERVER;
     public static GptGameMode gameMode;
