@@ -122,7 +122,7 @@ public class RoundSystem implements Listener {
     }
     @EventHandler
     public void onPortal(PlayerPortalEvent event){
-        if(!event.getTo().getWorld().getName().equals("world_nether")){
+        if(!event.getTo().getWorld().equals(WorldManager.getCurrentWorld())){
             event.setTo(WorldManager.getCurrentWorld().getSpawnLocation());
         }
         
