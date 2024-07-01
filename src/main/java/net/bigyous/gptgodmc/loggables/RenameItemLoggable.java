@@ -25,7 +25,7 @@ public class RenameItemLoggable extends BaseLoggable implements UserInputLoggabl
                 if(newName != null){
                     this.item = actualItem.getType().toString();
                     this.isValid = true;
-                    Moderation.moderateUserInput(newName, this);
+                    // Moderation.moderateUserInput(newName, this);
                 }
             }
         }

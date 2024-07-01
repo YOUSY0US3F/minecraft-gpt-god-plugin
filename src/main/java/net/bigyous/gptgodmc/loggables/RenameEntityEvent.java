@@ -22,7 +22,7 @@ public class RenameEntityEvent extends BaseLoggable implements UserInputLoggable
         this.name = isValid ? PlainTextComponentSerializer.plainText().serialize(item.getItemMeta().displayName()) : null;
         this.entity = event.getRightClicked().getName();
         this.actualEntity = event.getRightClicked();
-        if(isValid) Moderation.moderateUserInput(name, this);
+        // if(isValid) Moderation.moderateUserInput(name, this);
     }
 
     @Override

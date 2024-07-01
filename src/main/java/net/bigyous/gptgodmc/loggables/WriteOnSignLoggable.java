@@ -17,7 +17,7 @@ public class WriteOnSignLoggable extends BaseLoggable implements UserInputLoggab
             }    
         });
         this.text = sb.toString();
-        Moderation.moderateUserInput(text, this);
+        // Moderation.moderateUserInput(text, this);
     }
 
     @Override

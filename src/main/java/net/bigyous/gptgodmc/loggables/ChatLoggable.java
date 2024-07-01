@@ -18,14 +18,14 @@ public class ChatLoggable implements Loggable, UserInputLoggable {
         this.playerName = playerName;
         this.message = message;
         timestamp = Instant.now();
-        Moderation.moderateUserInput(message, this);
+        // Moderation.moderateUserInput(message, this);
     }
 
     public ChatLoggable(String playerName, String message, Instant timestamp) {
         this.playerName = playerName;
         this.message = message;
         this.timestamp = timestamp;
-        Moderation.moderateUserInput(message, this);
+        // Moderation.moderateUserInput(message, this);
     }
     public String getLog() {
         return playerName + " said \"" + message + "\"";
