@@ -23,8 +23,8 @@ startingWorld: ""
 
 # if set to true, the plugin will use the newest GPT-4 release
 # if set to false the plugin will use GPT 3.5
-# GPT 4 is not too expensive these days but you can save a bit of money by using 3.5 instead
-use-gpt-4: false
+# I can't see why you would use 3.5, it costs more and it's dumber
+use-gpt-4: true
 
 # whether or not the mod will make calls to GPT
 enabled: true
