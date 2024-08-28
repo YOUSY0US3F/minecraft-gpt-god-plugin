@@ -19,7 +19,7 @@ Rounds: true
 # the world the server will load on starting
 # worlds are stored in plugins/gptgodmc/worlds
 # if empty or invalid the Round System won't work
-startingWorld: ""
+startingWorld: "island"
 
 # if set to true, the plugin will use the newest GPT-4 release
 # if set to false the plugin will use GPT 3.5
