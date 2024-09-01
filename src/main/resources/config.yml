@@ -21,9 +21,8 @@ Rounds: true
 # if empty or invalid the Round System won't work
 startingWorld: "island"
 
-# if set to true, the plugin will use the newest GPT-4 release
-# if set to false the plugin will use GPT 3.5
-# I can't see why you would use 3.5, it costs more and it's dumber
+# if set to true, the plugin will use the newest stable GPT-4o release
+# if set to fals ethe plugin will use GPT-4o-mini
 use-gpt-4: true
 
 # whether or not the mod will make calls to GPT
@@ -38,3 +37,9 @@ gamemode: SANDBOX
 # How long the objectives given by GPT last
 # (in minutes)
 objectiveDecay: 6
+
+# the amount of time that will pass between calls to ChatGPT (in seconds)
+# can't be less that 1 second
+# I really don't reccomend going lower than 20
+# default 40
+rate: 40
