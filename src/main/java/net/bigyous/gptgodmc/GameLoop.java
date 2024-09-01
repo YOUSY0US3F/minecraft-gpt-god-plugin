@@ -27,6 +27,7 @@ public class GameLoop {
     private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. Only react to events listed under Current, Use the server history as a reference to note the change in player behavior %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
     private static String personality;
+    private static int rate = config.getInt("rate") < 1 ? 40 : config.getInt("rate");
 
     // converts seconds into ticks
     private static long seconds(long seconds) {
@@ -39,7 +40,7 @@ public class GameLoop {
         Action_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetActionTools());
         Speech_GPT_API = new GptAPI(GPTModels.getMainModel(), GptActions.GetSpeechTools());
         BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskTimerAsynchronously(plugin, new GPTTask(), seconds(30),
-                seconds(40));
+                seconds(rate));
         taskId = task.getTaskId();
         personality = Personality.generatePersonality();
         PROMPT = Prompts.getGamemodePrompt(GPTGOD.gameMode);

@@ -8,10 +8,10 @@ import net.bigyous.gptgodmc.GPT.Json.GptModel;
 
 public class GPTModels {
     private static FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
-    public static final GptModel GPT_4 = new GptModel("gpt-4o", 85000);
-    public static final GptModel GPT_3 = new GptModel("gpt-3.5-turbo", 16385);
+    public static final GptModel GPT_4o = new GptModel("gpt-4o", 100000);
+    public static final GptModel GPT_4o_mini = new GptModel("gpt-4o-turbo", 85000);
 
     public static GptModel getMainModel(){
-        return config.getBoolean("use-gpt-4")? GPT_4: GPT_3;
+        return config.getBoolean("use-gpt-4")? GPT_4o: GPT_4o_mini;
     }
 }
