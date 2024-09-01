@@ -307,7 +307,7 @@ public class GptActions {
                                     "The name of the player or Structure the player will be sent to")),
                     teleport)),
             Map.entry("setObjective", new GptFunction("setObjective", "set an objective for players to complete. base this off of the behaviors observed in the logs. objectives can't be longer than 45 characters", 
-            Map.of("objective", new Parameter("string", "the objective to set")), setObjective)),
+            Map.of("objective", new Parameter("string", "the objective to set, if it's for a specific player, be sure to include their name")), setObjective)),
             Map.entry("clearObjective", new GptFunction("clearObjective", "set an objective as complete. Follow this up with a reward", 
             Map.of("objective", new Parameter("string", "the objective to mark as complete")), clearObjective)),
             Map.entry("detonateStructure", new GptFunction("detonateStructure", "cause an explosion at a Structure",
