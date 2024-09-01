@@ -22,7 +22,7 @@ Rounds: true
 startingWorld: "island"
 
 # if set to true, the plugin will use the newest stable GPT-4o release
-# if set to false ethe plugin will use GPT-4o-mini
+# if set to false the plugin will use GPT-4o-mini
 use-gpt-4: true
 
 # whether or not the mod will make calls to GPT
