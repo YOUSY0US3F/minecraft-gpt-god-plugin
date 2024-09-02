@@ -2,7 +2,6 @@ package net.bigyous.gptgodmc.GPT;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.bukkit.entity.Entity;
@@ -20,6 +19,7 @@ import com.google.gson.GsonBuilder;
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.TTSRequest;
+import net.bigyous.gptgodmc.utils.QueuedAudio;
 
 public class TextToSpeech {
     private static GsonBuilder gson = new GsonBuilder();
@@ -45,14 +45,13 @@ public class TextToSpeech {
                 HttpResponse response = client.execute(post);
                 byte[] rawSamples =  response.getEntity().getContent().readAllBytes();
                 short[] samples = api.getAudioConverter().bytesToShorts(rawSamples);
-                for(Entity player : players) {
-                    api.createAudioPlayer(api.createEntityAudioChannel(UUID.randomUUID(), api.fromEntity(player)), api.createEncoder(), samples).startPlaying();
-                }
-                
+                QueuedAudio.playAudio(samples, players);
             } catch (IOException e) {
                 GPTGOD.LOGGER.error("There was an error making a request to GPT", e);
             }
         });
     }
+
+
 
 }

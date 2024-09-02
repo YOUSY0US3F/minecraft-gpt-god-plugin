@@ -51,12 +51,14 @@ public class GptActions {
     private int tokens = -1;
     private static Gson gson = new Gson();
     private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
-
+    private static Boolean useTts = plugin.getConfig().getBoolean("tts");
     private static void staticWhisper(String playerName, String message) {
         Player player = GPTGOD.SERVER.getPlayerExact(playerName);
         player.sendRichMessage("<i>You hear something whisper to you...</i>");
         player.sendMessage(message);
-        TextToSpeech.makeSpeech(message, player);
+        if(useTts){
+            TextToSpeech.makeSpeech(message, player);
+        }
         EventLogger.addLoggable(new GPTActionLoggable(
                 String.format("whispered \"%s\" to %s", message, playerName)));
     }
@@ -66,7 +68,9 @@ public class GptActions {
                 .decoration(TextDecoration.BOLD, true));
         GPTGOD.SERVER.broadcast(Component.text(message, NamedTextColor.LIGHT_PURPLE)
                 .decoration(TextDecoration.BOLD, true));
-        TextToSpeech.makeSpeech(message, null);
+        if(useTts){
+            TextToSpeech.makeSpeech(message, null);
+        }
         EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", message)));
     }
     // in hindsight, I should have used an interface or abstract class to do this but oh well...

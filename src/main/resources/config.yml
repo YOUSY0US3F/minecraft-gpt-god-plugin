@@ -47,3 +47,6 @@ rate: 40
 # The voice used by the TTS
 # https://platform.openai.com/docs/guides/text-to-speech/voice-options
 voice: onyx
+
+# use AI Text to Speech voice for god (uses OpenAI and will cost a bit more money)
+tts: true
