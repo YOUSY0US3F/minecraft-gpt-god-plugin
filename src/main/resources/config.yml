@@ -43,3 +43,10 @@ objectiveDecay: 6
 # I really don't reccomend going lower than 20
 # default 40
 rate: 40
+
+# The voice used by the TTS
+# https://platform.openai.com/docs/guides/text-to-speech/voice-options
+voice: onyx
+
+# use AI Text to Speech voice for god (uses OpenAI and will cost a bit more money)
+tts: true
