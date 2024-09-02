@@ -4,8 +4,7 @@ import org.apache.http.HttpResponse;
 import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.bukkit.entity.Entity;
-
+import org.bukkit.entity.Player;
 import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
@@ -28,11 +27,11 @@ public class TextToSpeech {
     private static VoicechatApi api = GPTGOD.VC_SERVER;
     private static FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
 
-    public static void makeSpeech(String input, Entity player){
-        Entity[] players = player == null ? GPTGOD.SERVER.getOnlinePlayers().toArray(new Entity[0]) : new Entity[] {player};
+    public static void makeSpeech(String input, Player player){
+        Player[] players = player == null ? GPTGOD.SERVER.getOnlinePlayers().toArray(new Player[0]) : new Player[] {player};
         makeTTsRequest(new TTSRequest("tts-1", input, config.getString("voice"), "pcm"), players);
     }
-    private static void makeTTsRequest(TTSRequest body, Entity[] players){
+    private static void makeTTsRequest(TTSRequest body, Player[] players){
         CloseableHttpClient client = HttpClientBuilder.create().build();
         pool.execute(() -> {
             StringEntity data = new StringEntity(gson.create().toJson(body), ContentType.APPLICATION_JSON);
