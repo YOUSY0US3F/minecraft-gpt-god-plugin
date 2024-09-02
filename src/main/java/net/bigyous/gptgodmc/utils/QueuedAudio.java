@@ -21,12 +21,12 @@ public class QueuedAudio {
     private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
     private static VoicechatServerApi api = (VoicechatServerApi)GPTGOD.VC_SERVER;
     private static ConcurrentLinkedQueue<audioEvent> playQueue = new ConcurrentLinkedQueue<audioEvent>();
-    private static float SAMPLE_RATE = 24000f;
+    private static float SAMPLE_RATE = 48000f;
     private static int taskId = -1;
     private static ConcurrentHashMap<UUID, AudioChannel> channels = new ConcurrentHashMap<UUID, AudioChannel>();
 
     public static void playAudio(short[] samples, Player[] players){
-        playQueue.add(new audioEvent(samples, players));
+        playQueue.add(new audioEvent(doubleSampleRate(samples), players));
         if(taskId == -1 || !GPTGOD.SERVER.getScheduler().isCurrentlyRunning(taskId)){
             BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskLater(plugin, playQueue.poll(), getLengthSeconds(samples)*20);
             taskId = task.getTaskId();
@@ -41,6 +41,16 @@ public class QueuedAudio {
         }
         return channels.get(uuid);
     } 
+    private static short[] doubleSampleRate(short[] source){
+        short[] result = new short[source.length * 2];
+        for(int i = 0; i < source.length; i++) {
+            result[i * 2] = source[i];
+            if(i != source.length - 1){
+                result[i * 2 + 1] = (short) ((source[i] + source[i + 1]) / 2);
+            }
+        }
+        return result;
+    }
     static class audioEvent implements Runnable {
         private short[] samples;
         private Player[] players;
