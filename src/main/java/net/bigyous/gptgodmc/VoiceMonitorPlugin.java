@@ -44,6 +44,7 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
     @Override
     public void initialize(VoicechatApi api) {
         GPTGOD.LOGGER.info("voice monitor initialized");
+        GPTGOD.VC_SERVER = api;
         buffers = new ConcurrentHashMap<UUID, PlayerAudioBuffer>();
         decoders = new ConcurrentHashMap<UUID, OpusDecoder>();
         encodingQueue = new TaskQueue<PlayerAudioBuffer>((PlayerAudioBuffer buffer) -> {

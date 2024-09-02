@@ -16,7 +16,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import com.google.gson.GsonBuilder;
 
-import de.maxhenkel.voicechat.api.VoicechatServerApi;
+import de.maxhenkel.voicechat.api.VoicechatApi;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.GPT.Json.TTSRequest;
 import net.bigyous.gptgodmc.utils.QueuedAudio;
@@ -25,7 +25,7 @@ public class TextToSpeech {
     private static GsonBuilder gson = new GsonBuilder();
     private static ExecutorService pool = Executors.newCachedThreadPool();
     private static String SPEECH_ENDPOINT = "https://api.openai.com/v1/audio/speech";
-    private static VoicechatServerApi api;
+    private static VoicechatApi api = GPTGOD.VC_SERVER;
     private static FileConfiguration config = JavaPlugin.getPlugin(GPTGOD.class).getConfig();
 
     public static void makeSpeech(String input, Entity player){

@@ -1,6 +1,7 @@
 package net.bigyous.gptgodmc;
 
 import de.maxhenkel.voicechat.api.BukkitVoicechatService;
+import de.maxhenkel.voicechat.api.VoicechatApi;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,6 +37,7 @@ public final class GPTGOD extends JavaPlugin {
     public static Team RED_TEAM;
     public static Team BLUE_TEAM;
     public static Objective GPT_OBJECTIVES;
+    public static VoicechatApi VC_SERVER;
 
     @Nullable
     private VoiceMonitorPlugin voicechatPlugin;
