@@ -23,7 +23,7 @@ startingWorld: "island"
 
 # name of the gpt model to use
 # can be found here: https://openai.com/api/pricing/
-gpt-model-name: gpt-4o-2024-08-06
+gpt-model-name: gpt-4o
 
 # gpt model token limit
 gpt-model-token-limit: 100000
