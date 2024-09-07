@@ -12,6 +12,27 @@ public class GPTModels {
     public static final GptModel GPT_4o_mini = new GptModel("gpt-4o-mini", 85000);
 
     public static GptModel getMainModel(){
-        return config.getBoolean("use-gpt-4")? GPT_4o: GPT_4o_mini;
+        String modelName;
+        if (config.isSet("gpt-model-name")) {
+            modelName = config.getString("gpt-model-name");
+        } else if (config.isSet("use-gpt-4")) {
+            // for passivity
+            modelName = config.getBoolean("use-gpt-4")? "gpt-4o": "gpt-4o-mini";
+        } else {
+            throw new RuntimeException("Please set a value for gpt-model-name.");
+        }
+
+        int tokenLimit;
+
+        if (config.isSet("gpt-model-token-limit")) {
+            tokenLimit = config.getInt("gpt-model-token-limit");
+        } else {
+            tokenLimit = switch (modelName) {
+                case "gpt-4o", "gpt-4o-2024-08-06" -> 100000;
+                case "gpt-4o-mini" -> 85000;
+                default -> throw new RuntimeException(String.format("Could not automatically determine token limit for %s. Please set gpt-model-token-limit in the config.", modelName));
+            };
+        }
+        return new GptModel(modelName, tokenLimit) ;
     }
 }
