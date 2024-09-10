@@ -21,9 +21,12 @@ Rounds: true
 # if empty or invalid the Round System won't work
 startingWorld: "island"
 
-# if set to true, the plugin will use the newest stable GPT-4o release
-# if set to false the plugin will use GPT-4o-mini
-use-gpt-4: true
+# name of the gpt model to use
+# can be found here: https://openai.com/api/pricing/
+gpt-model-name: gpt-4o
+
+# gpt model token limit
+gpt-model-token-limit: 100000
 
 # whether or not the mod will make calls to GPT
 enabled: true
