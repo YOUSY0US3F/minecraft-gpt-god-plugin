@@ -21,9 +21,12 @@ Rounds: true
 # if empty or invalid the Round System won't work
 startingWorld: "island"
 
-# if set to true, the plugin will use the newest stable GPT-4o release
-# if set to false the plugin will use GPT-4o-mini
-use-gpt-4: true
+# name of the gpt model to use
+# can be found here: https://openai.com/api/pricing/
+gpt-model-name: gpt-4o
+
+# gpt model token limit
+gpt-model-token-limit: 100000
 
 # whether or not the mod will make calls to GPT
 enabled: true
@@ -32,6 +35,35 @@ enabled: true
 # this is case sensitive
 #[SANDBOX, DEATHMATCH]
 gamemode: SANDBOX
+
+
+
+# The potential behaviors to be given to GPT. A specified amount will be chosen to either be liked, or disliked.
+potentialBehaviors: ["killing animals",
+                     "fighting other players",
+                     "slaying monsters",
+                     "using hostile language",
+                     "using vulgar language",
+                     "using friendly language",
+                     "building structures of worship",
+                     "building non-religious structures",
+                     "materialistic wants",
+                     "helping other players",
+                     "connecting with animals",
+                     "growing plants",
+                     "using fire and explosions",
+                     "love between players",
+                     "sexual behaviour",
+                     "generosity",
+                     "ritual sacrifice",
+                     "eating meat"]
+
+# X behaviors will be selected as disliked/liked.
+# A behavior cannot be both liked and disliked, nor can there be duplicates.
+# The total required behaviors must be equal to or less than the amount of potential behaviors.
+
+likedBehaviors: 3
+dislikedBehaviors: 3
 
 
 # How long the objectives given by GPT last
