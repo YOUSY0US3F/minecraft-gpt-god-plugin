@@ -26,9 +26,10 @@ public class QueuedAudio {
     private static ConcurrentHashMap<UUID, AudioChannel> channels = new ConcurrentHashMap<UUID, AudioChannel>();
 
     public static void playAudio(short[] samples, Player[] players){
-        playQueue.add(new audioEvent(doubleSampleRate(samples), players));
+        short[] resampled = doubleSampleRate(samples);
+        playQueue.add(new audioEvent(resampled, players));
         if(taskId == -1 || !GPTGOD.SERVER.getScheduler().isCurrentlyRunning(taskId)){
-            BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskLater(plugin, playQueue.poll(), getLengthSeconds(samples)*20);
+            BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskLater(plugin, playQueue.poll(), getLengthSeconds(resampled)*20);
             taskId = task.getTaskId();
         }
     }
