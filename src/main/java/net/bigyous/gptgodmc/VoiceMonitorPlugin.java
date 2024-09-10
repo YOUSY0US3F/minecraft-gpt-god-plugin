@@ -51,10 +51,10 @@ public class VoiceMonitorPlugin implements VoicechatPlugin {
             Instant timestamp = Instant.now();
             String speech = Transcription.Transcribe(AudioFileManager.getPlayerFile(buffer.getPlayer(), buffer.getBufferId()));
             AudioFileManager.deleteFile(buffer.getPlayer(), buffer.getBufferId());
-            GPTGOD.LOGGER.info(String.format("%s said: %s", buffer.getPlayer().getName(), speech));
-            if(speech == null){
+            if (speech == null || speech.isEmpty()) {
                 return;
             }
+            GPTGOD.LOGGER.info(String.format("%s said: %s", buffer.getPlayer().getName(), speech));
             EventLogger.addLoggable(new ChatLoggable(buffer.getPlayer().getName(), speech, timestamp));
         });
     }
