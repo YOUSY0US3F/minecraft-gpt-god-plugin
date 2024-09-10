@@ -42,7 +42,11 @@ public class StructureManager implements Listener {
     @EventHandler
     public void onBlockBurn(BlockBurnEvent event){
         removeBlockFromAllStructures(event.getBlock().getLocation());
-        EventLogger.addLoggable(new GenericEventLoggable(getStructureThatContains(event.getBlock().getLocation()) + " is on fire!"));
+        String structure = getStructureThatContains(event.getBlock().getLocation());
+        if (structure != null)
+        {
+            EventLogger.addLoggable(new GenericEventLoggable(structure + " is on fire!"));
+        }
     }
 
     @EventHandler
