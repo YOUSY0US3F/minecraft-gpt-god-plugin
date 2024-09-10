@@ -113,7 +113,9 @@ public final class GPTGOD extends JavaPlugin {
 
         @EventHandler
         public void onPlayerDisconnect(PlayerQuitEvent event) {
-            GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
+            if(SERVER.getOnlinePlayers().isEmpty()){
+                GPTGOD.SERVER.getScheduler().runTaskLater(JavaPlugin.getPlugin(GPTGOD.class), new StopGPT(), 20);
+            }
         }
 
         private static class StopGPT implements Runnable {
