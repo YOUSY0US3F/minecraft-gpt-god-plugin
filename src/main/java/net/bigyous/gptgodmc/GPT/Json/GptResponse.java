@@ -8,7 +8,6 @@ public class GptResponse {
     private int created;
     private String model;
     private Choice[] choices;
-    private Map<String, Integer> usage;
 
     public Choice[] getChoices() {
         return choices;
@@ -25,9 +24,5 @@ public class GptResponse {
 
     public String getObject() {
         return object;
-    }
-
-    public Map<String, Integer> getUsage() {
-        return usage;
     }
 }
