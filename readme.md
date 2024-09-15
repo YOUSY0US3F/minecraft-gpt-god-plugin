@@ -1,5 +1,8 @@
 # ![GPTGodIcon](https://github.com/user-attachments/assets/15ee2068-82d8-419a-9247-17332ec84600) GPTGOD Bukkit Plugin
 
+Fork to let the AI answer in german. Very basic right now, needs some
+testing. Umlauts might cause some issues, same with very long german words.
+
 ## Local Setup
 
 - clone the repo
