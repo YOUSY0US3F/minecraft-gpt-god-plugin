@@ -54,7 +54,7 @@ public class GptActions {
     private static Boolean useTts = plugin.getConfig().getBoolean("tts");
     private static void staticWhisper(String playerName, String message) {
         Player player = GPTGOD.SERVER.getPlayerExact(playerName);
-        player.sendRichMessage("<i>You hear something whisper to you...</i>");
+        player.sendRichMessage("<i>Du hoerst jemanden zu dir fluestern.....</i>");
         player.sendMessage(message);
         if(useTts){
             TextToSpeech.makeSpeech(message, player);
@@ -64,14 +64,14 @@ public class GptActions {
     }
 
     private static void staticAnnounce(String message) {
-        GPTGOD.SERVER.broadcast(Component.text("A Loud voice bellows from the heavens", NamedTextColor.YELLOW)
+        GPTGOD.SERVER.broadcast(Component.text("Eine Laute stimme entfällt dem Himmel", NamedTextColor.YELLOW)
                 .decoration(TextDecoration.BOLD, true));
         GPTGOD.SERVER.broadcast(Component.text(message, NamedTextColor.LIGHT_PURPLE)
                 .decoration(TextDecoration.BOLD, true));
         if(useTts){
             TextToSpeech.makeSpeech(message, null);
         }
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("announced \"%s\"", message)));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("kündigt an \"%s\"", message)));
     }
     // in hindsight, I should have used an interface or abstract class to do this but oh well...
 
@@ -100,8 +100,8 @@ public class GptActions {
             return;
         Player player = GPTGOD.SERVER.getPlayer(playerName);
         player.getInventory().addItem(new ItemStack(Material.matchMaterial(itemId), count));
-        player.sendRichMessage(String.format("<i>A %s appeared in your inventory</i>", itemId));
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("gave %d %s to %s", count, itemId, playerName)));
+        player.sendRichMessage(String.format("<i>%s erscheint in deinem Inventar</i>", itemId));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("Gab %d %s zu %s", playerName, count, itemId)));
     };
     private static Function<String> command = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -109,7 +109,7 @@ public class GptActions {
         Map<String, String> argsMap = gson.fromJson(args, mapType);
         GenerateCommands.generate(argsMap.get("prompt"));
         EventLogger
-                .addLoggable(new GPTActionLoggable(String.format("commanded \"%s\" to happen", argsMap.get("prompt"))));
+                .addLoggable(new GPTActionLoggable(String.format("befahl \"%s\" zu passieren", argsMap.get("prompt"))));
     };
     private static Function<String> smite = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -119,7 +119,7 @@ public class GptActions {
         for (int i = 0; i < power; i++) {
             WorldManager.getCurrentWorld().strikeLightning(player.getLocation());
         }
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("smited %s", playerName)));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("Bestrafte %s", playerName)));
     };
     private static Function<String> spawnEntity = (String args) -> {
         JsonObject argObject = JsonParser.parseString(args).getAsJsonObject();
@@ -144,8 +144,8 @@ public class GptActions {
             ent.customName(nameComponent);
         }
         EventLogger.addLoggable(
-                new GPTActionLoggable(String.format("summoned %d %s%s near %s", count, entityName,
-                        customName != null ? String.format(" named: %s,", customName) : "", position)));
+                new GPTActionLoggable(String.format("beschwor %d %s%s bei %s", count, entityName,
+                        customName != null ? String.format(" Genannt: %s,", customName) : "", position)));
     };
     private static Function<String> summonSupplyChest = (String args) -> {
         TypeToken<List<String>> stringArrayType = new TypeToken<List<String>>() {
@@ -176,7 +176,7 @@ public class GptActions {
         WorldManager.getCurrentWorld().spawnParticle(Particle.WAX_OFF, chest.getLocation().toCenterLocation(), 100,
                 2,
                 3, 2);
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("summoned a chest with: %s inside next to %s",
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("erschuff eine Kiste mit: %s neben %s",
                 String.join(", ", itemNames), playerName)));
 
     };
@@ -188,7 +188,7 @@ public class GptActions {
                 .forEach((Block b) -> b.setType(Material.matchMaterial(blockType)));
         EventLogger.addLoggable(
                 new GPTActionLoggable(
-                        String.format("turned all the blocks in Structure %s to %s", structure, blockType)));
+                        String.format("verwandelte alle Blöcke names %s zu %s", structure, blockType)));
 
     };
     private static Function<String> revive = (String args) -> {
@@ -217,7 +217,7 @@ public class GptActions {
                 ? StructureManager.getStructure(destName).getLocation()
                 : GPTGOD.SERVER.getPlayer(destName).getLocation();
         player.teleport(destination);
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("teleported %s to %s", playerName, destName)));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("teleportierte %s to %s", playerName, destName)));
     };
     private static Function<String> setObjective = (String args) -> {
         TypeToken<Map<String, String>> mapType = new TypeToken<Map<String, String>>() {
@@ -243,7 +243,7 @@ public class GptActions {
         if(GPTGOD.SCOREBOARD.getEntries().stream().filter(entry -> GPTGOD.SERVER.getPlayer(entry) == null).count() < 1){
             GPTGOD.GPT_OBJECTIVES.setDisplaySlot(null);
         }
-        EventLogger.addLoggable(new GPTActionLoggable(String.format("declared objective %s as completed", objective)));
+        EventLogger.addLoggable(new GPTActionLoggable(String.format("erklärt Aufgabe %s als abgeschlossen", objective)));
         
     };
     private static Function<String> detonateStructure = (String args) -> {
@@ -256,26 +256,26 @@ public class GptActions {
     };
     private static Map<String, GptFunction> functionMap = Map.ofEntries(
             Map.entry("whisper", new GptFunction("whisper",
-                    "privately send a message to a player. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
-                    Map.of("playerName", new Parameter("string", "name of the player to privately send to"),
-                            "message", new Parameter("string", "the message")),
+                    "Schickte eine private Nachricht zu einem Spieler. Vermeide das widerholen von Nachrichten. Halte Nachrichten kurz, präzise, nicht mehr als 100 zeichen.",
+                    Map.of("playerName", new Parameter("string", "Name des Empfängers"),
+                            "message", new Parameter("string", "die Nachricht")),
                     whisper)),
             Map.entry("announce", new GptFunction("announce",
-                    "brodcast a message to all players. Avoid repeating things that have already been said. Keep messages short, concise, and no more than 100 characters.",
+                    "schicke eine Nachricht an alle Spieler. Halte Nachrichten kurz, präzise, nicht mehr als 100 zeichen..",
                     Map.of("message", new Parameter("string", "the message")),
                     announce)),
-            Map.entry("giveItem", new GptFunction("giveItem", "give a player any amount of an item",
-                    Map.of("playerName", new Parameter("string", "name of the Player"),
-                            "itemId", new Parameter("string", "the name of the minecraft item"),
-                            "count", new Parameter("number", "amount of the item")),
+            Map.entry("giveItem", new GptFunction("giveItem", "Gebe einem Spieler Items",
+                    Map.of("playerName", new Parameter("string", "Name des Spielers"),
+                            "itemId", new Parameter("string", "Name des Minecraft Items"),
+                            "count", new Parameter("number", "Anzahl der Items")),
                     giveItem)),
             Map.entry("command", new GptFunction("command",
-                    "Describe a series of events you would like to take place, taking into consideration the limitations of minecraft",
-                    Collections.singletonMap("prompt", new Parameter("string", "a description of what will happen")),
+                    "Beschreibe eine Serie von Events, die stattfinden soll, beachte die Begrenzungen von Minecraft",
+                    Collections.singletonMap("prompt", new Parameter("string", "Eine Beschreibung was passieren wird")),
                     command)),
-            Map.entry("smite", new GptFunction("smite", "Strike a player down with lightning, reserve this punishment for repeat offenders",
-                    Map.of("playerName", new Parameter("string", "the player's name"),
-                            "power", new Parameter("number", "the strength of this smiting")),
+            Map.entry("smite", new GptFunction("smite", "Bestrafe einen Spieler mit einem Blitzschlag, nutze dies nur für wiederholtes schlechtes Verhalten",
+                    Map.of("playerName", new Parameter("string", "Name des Spielers"),
+                            "power", new Parameter("number", "Stärke des Schlags")),
                     smite)),
             Map.entry("transformStructure",
                     new GptFunction("transformStructure", "replace all the blocks in a structure with any block",

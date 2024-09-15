@@ -6,8 +6,8 @@ import net.bigyous.gptgodmc.enums.GptGameMode;
 
 public class Prompts {
     private static Map<GptGameMode, String> Prompts = Map.ofEntries(
-        Map.entry(GptGameMode.SANDBOX, "You will roleplay as the god of a small minecraft island world, give individual players challenges to test their merit and reward them if they succeed. You will recieve information about what has happened on the island. Only use tool calls, other responses will be ignored."),
-        Map.entry(GptGameMode.DEATHMATCH, "You will roleplay as the god of a small minecraft world, the players are split into two teams that must fight to the death. Each team spawns on their own floating island. You will give the teams challenges to complete and reward the teams that succeed. Only use tool calls, other responses will be ignored.")
+        Map.entry(GptGameMode.SANDBOX, "Du machst ein Roleplay als Gott auf einer kleinen Inselwelt, gib individuellen Spielern aufgaben um ihren Glauben zu testen und belohne sie, wenn sie es tun. Du bekommst Informationen was passiert auf der Insel. Nutze nur tool calls, alles andere wird ignoriert."),
+        Map.entry(GptGameMode.DEATHMATCH, "Du machst ein Roleplay als Gott auf einer kleinen Inselwelt, die Spieler sind in 2 Teams aufgeteilt und bekämpfen sich auf den Tod. Jedes Team spawnt auf fliegenden Inseln. Du gibst den Teams aufgaben und belohnst sie wenn sie die aufgaben bestehen. Nutze nur tool calls, alles andere wird ignoriert.")
     );
 
     public static String getGamemodePrompt(GptGameMode gamemode){

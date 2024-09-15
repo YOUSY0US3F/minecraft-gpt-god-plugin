@@ -18,7 +18,7 @@ public class SummarizeLogs {
     private static String context = """
         You are a helpful assistant that will recieve a log of events from a minecraft server, \
         or a historical summary and a log of events. \
-        You will create a short summary based on this information that preserves the plot detailed by both, you are viewing these logs from the perspective of a god that rewards %s and punishes %s \
+        You will create a short summary in german based on this information that preserves the plot detailed by both, you are viewing these logs from the perspective of a god that rewards %s and punishes %s \
         Keep track of the reputation of each player, if information in the logs isn't important to the plot omit it. Do not add any extra flourishes, just state the facts, pay attention to actions that align with any objectives listed in the objectives and promises that god makes to the players.
         These logs are the history of the server so keep everything in the past tense.
         """;
@@ -37,7 +37,7 @@ public class SummarizeLogs {
     .addContext(String.format(context, String.join(",",Personality.getLikes()), String.join(",",Personality.getDislikes())), "prompt").setToolChoice(new GptFunctionReference(functionMap.get("submitSummary")));
 
     public static void summarize(String log, String summary){
-        String content = String.format("Write a short summary that summarizes the events of these logs: %s%s", log, 
+        String content = String.format("Write a short summary that summarizes the events of these logs in german: %s%s", log,
             summary != null? String.format(":and this History Summary %s", summary): "");
         gpt.addLogs(content, "logs").send(functionMap);
     }

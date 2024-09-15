@@ -33,10 +33,11 @@ public class GenerateCommands {
     private static GptTool[] tools = GptActions.wrapFunctions(functionMap);
     private static GptAPI gpt = new GptAPI(GPTModels.getMainModel(), tools)
             .addContext("""
-                    You are a helpful assistant that will generate \
-                    minecraft java edition commands based on a prompt inputted by the user, \
-                    even if the prompt seems impossible in minecraft try to approximate it as close as possible \
-                    with minecraft commands a wrong answer is better than no answer. \
+                    Du bist ein hilfreicher Assistent zum generieren von\
+                    
+                    minecraft java edition commands basierend auf Prompts des Users, \
+                    auch wenn es unmöglich ist, probiere so nah wie möglich dran zu kommen \
+                    mit Minecraft commands, eine falsche antwort ist besser als keine. \
                     """, "context")
             .setToolChoice(new GptFunctionReference(functionMap.get("inputCommands")));
 
@@ -59,7 +60,7 @@ public class GenerateCommands {
                                 GPTGOD.SERVER.getOnlinePlayers().stream().map(player -> player.getName()).toArray())),
                 "PlayerNames")
                 .addContext(String.format("Structures: %s", structures), "structures")
-                .addLogs(String.format("write Minecraft commands that: %s", prompt), "prompt")
+                .addLogs(String.format("SChreibe minecraft commands die: %s", prompt), "prompt")
                 .send(functionMap);
     }
 }
