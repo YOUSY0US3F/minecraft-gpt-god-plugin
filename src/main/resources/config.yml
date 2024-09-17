@@ -82,3 +82,6 @@ voice: onyx
 
 # use AI Text to Speech voice for god (uses OpenAI and will cost a bit more money)
 tts: true
+
+# write your own prompt here instead of the deafault prompts
+promptOverride: ""
