@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -14,6 +15,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import de.maxhenkel.voicechat.api.VoicechatServerApi;
 import de.maxhenkel.voicechat.api.audiochannel.AudioChannel;
+import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import net.bigyous.gptgodmc.GPTGOD;
 import net.bigyous.gptgodmc.WorldManager;
 
@@ -21,21 +23,22 @@ public class QueuedAudio {
     private static JavaPlugin plugin = JavaPlugin.getPlugin(GPTGOD.class);
     private static VoicechatServerApi api = (VoicechatServerApi)GPTGOD.VC_SERVER;
     private static ConcurrentLinkedQueue<audioEvent> playQueue = new ConcurrentLinkedQueue<audioEvent>();
-    private static float SAMPLE_RATE = 48000f;
-    private static int taskId = -1;
+    // private static float SAMPLE_RATE = 48000f;
+    private static AtomicInteger AtomicTaskId = new AtomicInteger(-1);
     private static ConcurrentHashMap<UUID, AudioChannel> channels = new ConcurrentHashMap<UUID, AudioChannel>();
+    
 
     public static void playAudio(short[] samples, Player[] players){
         short[] resampled = doubleSampleRate(samples);
         playQueue.add(new audioEvent(resampled, players));
-        if(taskId == -1 || !GPTGOD.SERVER.getScheduler().isCurrentlyRunning(taskId)){
-            BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskLater(plugin, playQueue.poll(), getLengthSeconds(resampled)*20);
-            taskId = task.getTaskId();
+        if(AtomicTaskId.get() == -1 || !GPTGOD.SERVER.getScheduler().isCurrentlyRunning(AtomicTaskId.get())){
+            BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskAsynchronously(plugin, playQueue.poll());
+            AtomicTaskId.set(task.getTaskId());
         }
     }
-    private static long getLengthSeconds(short[] audio) {
-        return (long) (audio.length / SAMPLE_RATE);
-    }
+    // private static long getLengthSeconds(short[] audio) {
+    //     return (long) (audio.length / SAMPLE_RATE);
+    // }
     private static AudioChannel getplayerAudioChannel(UUID uuid){
         if(!channels.containsKey(uuid)){
             channels.put(uuid, api.createStaticAudioChannel(UUID.randomUUID(), api.fromServerLevel(WorldManager.getCurrentWorld()) , api.getConnectionOf(uuid)));
@@ -62,13 +65,22 @@ public class QueuedAudio {
         }
 
         public void run(){
+            AudioPlayer currentAudioPlayer = null;
             for(Player player : players) {
                 GPTGOD.LOGGER.info("playing audio for player: ", player.getName());
-                api.createAudioPlayer(getplayerAudioChannel(player.getUniqueId()), api.createEncoder(), samples).startPlaying();
+                currentAudioPlayer = api.createAudioPlayer(getplayerAudioChannel(player.getUniqueId()), api.createEncoder(), samples);
+                currentAudioPlayer.startPlaying();
+            }
+            while(currentAudioPlayer != null && currentAudioPlayer.isPlaying()){
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    GPTGOD.LOGGER.warn("TTS interrupted", e);
+                }
             }
             if(playQueue.peek() != null){
-                BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskLater(plugin, playQueue.poll(), getLengthSeconds(samples)*20);
-                taskId = task.getTaskId();
+                BukkitTask task = GPTGOD.SERVER.getScheduler().runTaskAsynchronously(plugin, playQueue.poll());
+                AtomicTaskId.set(task.getTaskId());
             }
         }
     }
