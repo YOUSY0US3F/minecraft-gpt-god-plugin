@@ -12,7 +12,7 @@ public class Personality {
     private static List<String> likes = List.of();
     private static List<String> dislikes = List.of();
     private static List<String> behaviours = config.getStringList("potentialBehaviors");
-
+  
     private static String briefing = "The following are behaviours you must reward or punish players for doing. Don't explicitly tell the players this list. When punishing players, reserve directly damaging players for repeat offenders. If most of the players disobey you punish everyone";
 
     public static String generatePersonality() {

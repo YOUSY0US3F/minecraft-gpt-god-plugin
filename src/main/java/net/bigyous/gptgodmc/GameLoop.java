@@ -23,7 +23,7 @@ public class GameLoop {
     private static int taskId;
     public static boolean isRunning = false;
     private static String PROMPT;
-    private static String SPEECH_PROMPT_TEPLATE = "%s%s, You can now communicate with the players. Use the server history as a reference to note the change in player behavior %s";
+    private static String SPEECH_PROMPT_TEPLATE = "%s%s\nYou can now communicate with the players. Use the server history as a reference to note the change in player behavior.\n%s";
     private static String ACTION_PROMPT_TEMPLATE = "%s Use this information and the tools provided to reward or punish the players. Only react to events listed under Current, Use the server history as a reference to note the change in player behavior %s";
     private static ArrayList<String> previousActions = new ArrayList<String>();
     private static String personality;
