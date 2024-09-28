@@ -7,7 +7,7 @@
 openAiKey: ""
 
 # language in ISO-639 format https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
-language: en
+language: de
 
 # if set to true:
 # - When players die they are put in spectator mode
