@@ -3,8 +3,37 @@
 
 # your OpenAi API key from https://platform.openai.com/api-keys
 # the plugin won't work without this
-
 openAiKey: ""
+
+# Select the inference provider to use for chat completions.
+# Supported values: openai | openrouter | ollama | lmstudio | generic | nim
+inference-provider: openai
+
+# OpenRouter (OpenAI-compatible cloud proxy)
+openRouterKey: ""
+openRouterUrl: "https://api.openrouter.ai/v1"
+
+# Ollama (local server) — change if your Ollama daemon runs on a different host/port **tool calls are not currently supported when using Ollama**
+ollamaUrl: "http://localhost:11434"
+
+# LM Studio (local server) — change if your LM Studio host/port differ
+# LM Studio exposes an OpenAI-compatible chat endpoint by default; function/tool calls are supported when
+# `inference-provider` is set to `lmstudio`.
+lmstudioUrl: "http://localhost:1234"
+
+# Generic OpenAI-compatible provider (set base URL and API key)
+# Use this for any service that implements the OpenAI Chat API surface.
+genericUrl: "https://api.your-provider.example"
+genericKey: ""
+
+# NVIDIA NIM (OpenAI-compatible endpoint)
+# Default is the cloud endpoint; change if using a self-hosted NIM gateway.
+nimUrl: "https://integrate.api.nvidia.com/v1"
+nimKey: ""
+
+# Optional NIM-specific parameters passed in the request body (JSON).
+# Example: {"chat_template_kwargs": {"enable_thinking": true, "clear_thinking": false}}
+nimExtraBody: "{}"
 
 # language in ISO-639 format https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
 language: en

@@ -38,8 +38,101 @@ shadowJar {
 
 ## Running
 
-- go to `plugins/gptgodmc/config.yml`
-- paste in your OpenAi API key
+- start the server once to generate `plugins/gptgodmc/config.yml`
+- set `inference-provider` in `config.yml` to one of:
+    - `openai`
+    - `openrouter`
+    - `ollama`
+    - `lmstudio`
+    - `generic`
+    - `nim`
+
+### Provider Configuration
+
+Use only the values needed for your selected provider:
+
+URL behavior from this PR:
+
+- For `openrouter`, `lmstudio`, `generic`, and `nim`, you can provide either:
+    - a base URL (for example `https://api.openrouter.ai`), or
+    - a `/v1` URL (for example `https://api.openrouter.ai/v1`), or
+    - a full chat endpoint ending in `/chat/completions`
+- The plugin normalizes these automatically for OpenAI-compatible providers:
+    - if URL ends with `/chat/completions`, it is used as-is
+    - if URL ends with `/v1`, `/chat/completions` is appended
+    - otherwise `/v1/chat/completions` is appended
+- Trailing `/` is stripped automatically.
+- For `ollama`, set only the server base URL (for example `http://localhost:11434`); the plugin always appends `/api/generate`.
+
+- `openai`
+    - set `openAiKey`
+- `openrouter`
+    - set `openRouterKey`
+    - optional: set `openRouterUrl` (default: `https://api.openrouter.ai/v1`)
+- `ollama`
+    - set `ollamaUrl` if needed (default: `http://localhost:11434`)
+    - note: tool/function calling is not currently supported when using Ollama in this plugin
+- `lmstudio`
+    - set `lmstudioUrl` if needed (default: `http://localhost:1234`)
+    - uses LM Studio's OpenAI-compatible chat endpoint
+- `generic`
+    - set `genericUrl` to your OpenAI-compatible provider URL (base, `/v1`, or full `/chat/completions` endpoint)
+    - set `genericKey`
+- `nim`
+    - set `nimUrl` if needed (default: `https://integrate.api.nvidia.com/v1`)
+    - set `nimKey`
+    - optional: set `nimExtraBody` with JSON for NIM-specific request params
+
+### Example Configs
+
+OpenAI:
+
+```yaml
+inference-provider: openai
+openAiKey: "YOUR_OPENAI_KEY"
+```
+
+OpenRouter:
+
+```yaml
+inference-provider: openrouter
+openRouterKey: "YOUR_OPENROUTER_KEY"
+openRouterUrl: "https://api.openrouter.ai/v1"
+```
+
+Ollama (local):
+
+```yaml
+inference-provider: ollama
+ollamaUrl: "http://localhost:11434"
+```
+
+LM Studio (local):
+
+```yaml
+inference-provider: lmstudio
+lmstudioUrl: "http://localhost:1234"
+```
+
+Generic OpenAI-compatible provider:
+
+```yaml
+inference-provider: generic
+genericUrl: "https://api.your-provider.example"
+genericKey: "YOUR_PROVIDER_KEY"
+```
+
+NVIDIA NIM:
+
+```yaml
+inference-provider: nim
+nimUrl: "https://integrate.api.nvidia.com/v1"
+nimKey: "YOUR_NIM_KEY"
+nimExtraBody: '{"chat_template_kwargs": {"enable_thinking": true, "clear_thinking": false}}'
+```
+
+### Start the plugin
+
 - run the server
-- launch minecraft with fabric
-- connect to the server at `localhost`
+- launch Minecraft with Fabric + Simple Voice Chat mod installed
+- connect to the server (for local setup, usually `localhost`)

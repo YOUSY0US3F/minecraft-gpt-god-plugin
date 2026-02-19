@@ -56,6 +56,10 @@ public class GptRequest {
         return messages.size();
     }
 
+    public ArrayList<GptMessage> getMessages(){
+        return messages;
+    }
+
     public void replaceMessage(int index, String message){
         this.messages.set(index, new GptMessage(this.messages.get(index).getRole(), message));
     }
